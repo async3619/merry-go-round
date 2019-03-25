@@ -2,13 +2,10 @@
 #include <iostream>
 
 struct Greeter {
-  static void sayHello(
-    std::string name
-  ) {
-    std::cout
-      << "Hello, "
-      << name << "!\n";
-  }
+	static bool sayHello(std::string name) {
+		std::cout << "Hello, " << name << "!\n";
+		return true;
+	}
 };
 
 #include "nbind/nbind.h"
