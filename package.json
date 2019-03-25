@@ -1,9 +1,23 @@
 {
-  "name": "merry-go-round",
-  "version": "0.1.0",
-  "description": "a node.js module for handling media files",
-  "main": "index.js",
-  "repository": "https://github.com/async3619/merry-go-round",
-  "author": "Sophia <async3619@naver.com>",
-  "license": "MIT"
+    "name": "merry-go-round",
+    "version": "0.1.0",
+    "description": "a node.js module for handling media files",
+    "main": "src/index.js",
+    "repository": "https://github.com/async3619/merry-go-round",
+    "author": "Sophia <async3619@naver.com>",
+    "license": "MIT",
+    "scripts": {
+        "install": "autogypi",
+        "build": "node-gyp configure build",
+        "clean": "rimraf build",
+        "start": "node src/index.js"
+    },
+    "dependencies": {
+        "autogypi": "^0.2.2",
+        "nbind": "^0.3.15",
+        "node-gyp": "^3.8.0"
+    },
+    "devDependencies": {
+        "rimraf": "^2.6.3"
+    }
 }
