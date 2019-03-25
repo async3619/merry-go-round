@@ -21,6 +21,7 @@
         "postcompile": "cpx ./src/lib-types.d.ts ./dist/commonjs && cpx src/lib-types.d.ts dist/esnext",
         "build": "node-gyp configure build",
         "clean": "rimraf dist build",
+        "dev": "ts-node --project \"./tsconfig.test.json\" ./_test.ts",
         "test": "cross-env TS_NODE_PROJECT=\"tsconfig.test.json\" mocha -r ts-node/register test/**/*.spec.ts"
     },
     "dependencies": {

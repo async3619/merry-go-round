@@ -5,6 +5,7 @@ node_modules/
 dist/
 
 src/lib-types.d.ts
+_test.ts
 
 auto-top.gypi
 auto.gypi
