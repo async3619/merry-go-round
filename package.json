@@ -1,0 +1,9 @@
+{
+  "name": "merry-go-round",
+  "version": "0.1.0",
+  "description": "a node.js module for handling media files",
+  "main": "index.js",
+  "repository": "https://github.com/async3619/merry-go-round",
+  "author": "Sophia <async3619@naver.com>",
+  "license": "MIT"
+}
