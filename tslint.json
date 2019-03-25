@@ -1,0 +1,24 @@
+{
+    "extends": ["tslint:recommended"],
+    "linterOptions": {
+        "exclude": ["dist", "src/*.d.ts"]
+    },
+    "rules": {
+        "max-line-length": false,
+        "no-var-requires": false,
+        "ban-types": false,
+        "jsx-no-lambda": false,
+        "no-empty-interface": false,
+        "max-classes-per-file": false,
+        "curly": false,
+        "jsx-boolean-value": false,
+        "semicolon": false,
+        "member-ordering": false,
+        "object-literal-key-quotes": false,
+        "no-console": false,
+        "ordered-imports": false,
+        "arrow-parens": false,
+        "object-literal-sort-keys": false,
+        "interface-name": false
+    }
+}

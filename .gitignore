@@ -1,6 +1,8 @@
+.vs/
 .idea/
 build/
 node_modules/
+dist/
 
 auto-top.gypi
 auto.gypi
