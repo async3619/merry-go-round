@@ -3,4 +3,4 @@ import * as LibTypes from "./lib-types";
 
 const { lib } = nbind.init<typeof LibTypes>();
 
-export const { Greeter } = lib;
+export const { Music } = lib;

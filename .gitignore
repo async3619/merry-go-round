@@ -7,5 +7,7 @@ dist/
 src/lib-types.d.ts
 _test.ts
 
+CppProperties.json
+
 auto-top.gypi
 auto.gypi
