@@ -39,14 +39,12 @@ const tasks = new Listr([
     {
         title: "Install native dependencies",
         task: () => {
-            return new Listr(
-                dependencies.map<Listr.ListrTask>(dependency => {
-                    return {
-                        title: `Installing ${dependency}`,
-                        task: () => installDependency(dependency),
-                    };
-                }),
-            );
+            return new Listr([
+                {
+                    title: `Installing dependencies`,
+                    task: () => installDependency(dependencies),
+                },
+            ]);
         },
     },
 ]);

@@ -34,6 +34,7 @@
         "@types/chai": "^4.1.7",
         "@types/fs-extra": "^5.0.5",
         "@types/listr": "^0.13.0",
+        "@types/lodash.flatten": "^4.4.6",
         "@types/mocha": "^5.2.6",
         "@types/node": "^11.11.6",
         "@types/node-fetch": "^2.1.7",
@@ -53,6 +54,7 @@
         "filenamify": "^3.0.0",
         "fs-extra": "^7.0.1",
         "listr": "^0.14.3",
+        "lodash.flatten": "^4.4.0",
         "mocha": "^6.0.2",
         "node-fetch": "^2.3.0",
         "prettier": "^1.16.4",
@@ -64,6 +66,7 @@
         "typescript": "^3.3.4000"
     },
     "nativeDependencies": [
-        "async3619/prebuilts/taglib"
+        "async3619/prebuilts/taglib",
+        "async3619/prebuilts/boost-filesystem"
     ]
 }

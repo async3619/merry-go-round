@@ -1,3 +1,6 @@
+// @ts-ignore
+import * as flatten from "lodash.flatten";
+
 import {
     bindingPath,
     bindingTemplatePath,
@@ -32,13 +35,23 @@ function compileDependencyMetadata(metadataItems: DependencyMetadataItem[], depe
         .filter(meta => meta)
         .map(itemPath => path.resolve(dependencyDirectory, itemPath));
 }
-export async function installDependency(dependencyName: string) {
-    const dependencyDirectory = path.resolve(dependencyPath, getDependencyName(dependencyName));
-    const metaFilePath = path.resolve(dependencyDirectory, "./meta.json");
-    const metadata: DependencyMetadata = JSON.parse((await fs.readFile(metaFilePath)).toString());
+export async function installDependency(dependencies: string[]) {
+    const metadataPromises = dependencies.map<Promise<DependencyMetadata>>(async dependencyName => {
+        const dependencyDirectory = path.resolve(dependencyPath, getDependencyName(dependencyName));
+        const metaFilePath = path.resolve(dependencyDirectory, "./meta.json");
+        const meta = JSON.parse((await fs.readFile(metaFilePath)).toString());
 
-    metadata.includePath = compileDependencyMetadata(metadata.includePath, dependencyDirectory);
-    metadata.libraryPath = compileDependencyMetadata(metadata.libraryPath, dependencyDirectory);
+        meta.includePath = compileDependencyMetadata(meta.includePath, dependencyDirectory);
+        meta.libraryPath = compileDependencyMetadata(meta.libraryPath, dependencyDirectory);
+
+        return meta;
+    });
+
+    const metadataArray = await Promise.all(metadataPromises);
+    const metadata: DependencyMetadata = {
+        includePath: flatten(metadataArray.map(m => m.includePath)),
+        libraryPath: flatten(metadataArray.map(m => m.libraryPath)),
+    };
 
     let binding = (await fs.readFile(bindingTemplatePath)).toString();
     binding = binding.replace(/"%INCLUDE_PATH%"/g, JSON.stringify(metadata.includePath));
