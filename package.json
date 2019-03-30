@@ -17,13 +17,13 @@
         "ndts": "ndts",
         "install": "autogypi && yarn install-deps && yarn compile",
         "precompile": "yarn build && npm run -s -- ndts . > ./src/lib-types.d.ts",
-        "compile": "tsc -m esnext --outDir dist/esnext && tsc -m commonjs --outDir dist/commonjs",
+        "compile": "tsc --project \"./tsconfig.build.json\" -m esnext --outDir dist/esnext && tsc --project \"./tsconfig.build.json\" -m commonjs --outDir dist/commonjs",
         "postcompile": "cpx ./src/lib-types.d.ts ./dist/commonjs && cpx src/lib-types.d.ts dist/esnext",
         "build": "node-gyp configure build",
-        "install-deps": "ts-node --project \"./tsconfig.test.json\" ./tools/install-deps",
+        "install-deps": "ts-node ./tools/install-deps",
         "clean": "rimraf dist build",
-        "dev": "ts-node --project \"./tsconfig.test.json\" ./_test.ts",
-        "test": "cross-env TS_NODE_PROJECT=\"tsconfig.test.json\" mocha -r ts-node/register test/**/*.spec.ts"
+        "dev": "ts-node  ./_test.ts",
+        "test": "cross-env mocha -r ts-node/register test/**/*.spec.ts"
     },
     "dependencies": {
         "autogypi": "^0.2.2",
