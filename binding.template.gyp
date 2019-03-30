@@ -13,6 +13,9 @@
 			"conditions": [
 				["OS=='win'", {
 					"msbuild_settings": {
+						"ClCompile": {
+							"RuntimeLibrary": "MultiThreaded"
+						},
 						"Link": {
 							"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%"
 						}
