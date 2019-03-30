@@ -17,6 +17,7 @@
         "declaration": true,
         "outDir": "./dist",
         "rootDir": "./src",
+        "resolveJsonModule": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "alwaysStrict": true,

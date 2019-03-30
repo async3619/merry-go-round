@@ -3,11 +3,13 @@
 build/
 node_modules/
 dist/
+deps/
 
 src/lib-types.d.ts
 _test.ts
 
 CppProperties.json
 
+binding.gyp
 auto-top.gypi
 auto.gypi
