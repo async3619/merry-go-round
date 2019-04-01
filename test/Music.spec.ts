@@ -32,4 +32,14 @@ describe("Music class", () => {
             year: 2010,
         });
     });
+
+    it("should be able to get music file type", () => {
+        const music = Music.create(path.resolve(SAMPLES_PATH, "Witness-06-Farewell.mp3"));
+        expect(music.type()).to.equal("MPEG");
+    });
+
+    it("should be able to get music tag type", () => {
+        const music = Music.create(path.resolve(SAMPLES_PATH, "Witness-06-Farewell.mp3"));
+        expect(music.tagType()).to.equal("ID3v2.3");
+    });
 });

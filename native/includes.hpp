@@ -6,10 +6,12 @@
 #define BOOST_LIB_TOOLSET "vc140"
 
 #include <iostream>
+#include <functional>
 #include <unordered_map>
 #include <type_traits>
 
 #include <taglib/fileref.h>
+#include <taglib/tfilestream.h>
 #include <taglib/tag.h>
 #include <taglib/asffile.h>
 #include <taglib/mpegfile.h>
@@ -34,14 +36,18 @@
 
 #include <boost/type_index.hpp>
 #include <boost/locale.hpp>
+#include <boost/mpl/list.hpp>
+#include <boost/mpl/for_each.hpp>
+#include <boost/type.hpp>
 
 #include "utils.hpp"
 
 #include "releasable.hpp"
 #include "dictionary.hpp"
 #include "encoder.hpp"
-#include "music.hpp"
 
-#include <nbind/nbind.h>
+#include "music/internal/internal.hpp"
+#include "music/internal/mpeg.hpp"
+#include "music/music.hpp"
 
 #endif // MERRY_GO_ROUND_INCLUDES_HPP
