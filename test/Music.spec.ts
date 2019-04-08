@@ -62,6 +62,7 @@ describe("Music class", () => {
 
                 BufferManager.getInstance().readReservedBuffer(bufferKey, imageBuffer);
 
+                expect([value, ...rest].length).to.equal(5);
                 expect(mimeType).to.equal("image/jpeg");
                 expect(imageType).to.equal("Cover (front)");
                 expect(description).to.equal("");
