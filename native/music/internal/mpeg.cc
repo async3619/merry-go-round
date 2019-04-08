@@ -58,8 +58,9 @@ void MPEGMusicInternal::initializeID3v2(void) {
 		frameData.emplace_back(frameId);
 		delete[] frameId;
 
-		// APIC - [mimeType, imageType, description, bufferKey, bufferSize]
-		if (frame->frameID() == "APIC") {
+		auto id = frame->frameID();
+		if (id == "APIC") {
+			// APIC - [mimeType, imageType, description, bufferKey, bufferSize]
 			ID3v2::AttachedPictureFrame* attachedPicture = reinterpret_cast<ID3v2::AttachedPictureFrame*>(frame);
 
 			// add mine type
@@ -81,6 +82,21 @@ void MPEGMusicInternal::initializeID3v2(void) {
 
 			// add image data size
 			frameData.emplace_back(std::to_string(imageData.size()));
+		} else if (id == "PRIV") {
+			// PRIV - [ownerIdentifier, dataBuffer, dataBufferSize]
+			ID3v2::PrivateFrame* privateFrame = reinterpret_cast<ID3v2::PrivateFrame*>(frame);
+
+			// add owner identifier
+			frameData.emplace_back(privateFrame->owner().toCString());
+
+			// add data
+			auto dataBuffer = privateFrame->data();
+			auto dataBufferKey = BufferManager::getInstance().reserve(dataBuffer.data(), dataBuffer.size());
+
+			frameData.emplace_back(dataBufferKey);
+
+			// add data buffer size
+			frameData.emplace_back(std::to_string(dataBuffer.size()));
 		} else {
 			frameData.emplace_back(TO_UTF8(frame->toString().toCString()));
 		}

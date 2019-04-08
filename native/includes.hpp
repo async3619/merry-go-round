@@ -36,6 +36,7 @@
 #include <taglib/xmfile.h>
 #include <taglib/dsffile.h>
 #include <taglib/dsdifffile.h>
+#include <taglib/privateframe.h>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
