@@ -38,6 +38,13 @@ MPEGMusicInternal::MPEGMusicInternal(TagLib::File* targetFile) :
 }
 MPEGMusicInternal::~MPEGMusicInternal(void) { }
 
+std::string MPEGMusicInternal::serializeBuffer(TagLib::ByteVector& byteVector) {
+	auto bufferKey = BufferManager::getInstance().reserve(byteVector.data(), byteVector.size());
+	std::string data = "__merry_go_round_buffer::" + bufferKey + "::" + std::to_string(byteVector.size());
+
+	return data;
+}
+
 void MPEGMusicInternal::initializeID3v2(void) {
 	ID3v2::Tag* tag = this->mpegFile->ID3v2Tag();
 	auto* header = tag->header();
@@ -60,7 +67,7 @@ void MPEGMusicInternal::initializeID3v2(void) {
 
 		auto id = frame->frameID();
 		if (id == "APIC") {
-			// APIC - [mimeType, imageType, description, bufferKey, bufferSize]
+			// APIC - [mimeType, imageType, description, buffer]
 			ID3v2::AttachedPictureFrame* attachedPicture = reinterpret_cast<ID3v2::AttachedPictureFrame*>(frame);
 
 			// add mine type
@@ -74,16 +81,11 @@ void MPEGMusicInternal::initializeID3v2(void) {
 			// add description
 			frameData.emplace_back(attachedPicture->description().toCString());
 
-			// add actual image data buffer key
+			// add actual image data
 			auto imageData = attachedPicture->picture();
-			auto bufferKey = BufferManager::getInstance().reserve(imageData.data(), imageData.size());
-
-			frameData.emplace_back(bufferKey);
-
-			// add image data size
-			frameData.emplace_back(std::to_string(imageData.size()));
+			frameData.emplace_back(this->serializeBuffer(imageData));
 		} else if (id == "PRIV") {
-			// PRIV - [ownerIdentifier, dataBuffer, dataBufferSize]
+			// PRIV - [ownerIdentifier, data]
 			ID3v2::PrivateFrame* privateFrame = reinterpret_cast<ID3v2::PrivateFrame*>(frame);
 
 			// add owner identifier
@@ -91,12 +93,7 @@ void MPEGMusicInternal::initializeID3v2(void) {
 
 			// add data
 			auto dataBuffer = privateFrame->data();
-			auto dataBufferKey = BufferManager::getInstance().reserve(dataBuffer.data(), dataBuffer.size());
-
-			frameData.emplace_back(dataBufferKey);
-
-			// add data buffer size
-			frameData.emplace_back(std::to_string(dataBuffer.size()));
+			frameData.emplace_back(this->serializeBuffer(dataBuffer));
 		} else {
 			frameData.emplace_back(TO_UTF8(frame->toString().toCString()));
 		}

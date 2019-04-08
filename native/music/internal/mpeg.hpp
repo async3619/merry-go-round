@@ -12,6 +12,7 @@ public:
 	~MPEGMusicInternal(void);
 
 private:
+	std::string serializeBuffer(TagLib::ByteVector& byteVector);
 	void initializeID3v2(void);
 
 public:

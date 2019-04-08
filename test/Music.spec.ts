@@ -54,19 +54,28 @@ describe("Music class", () => {
         const musicData = music.nativeData();
         const sampleAlbumCoverData = fs.readFileSync(path.resolve(SAMPLES_PATH, "Witness-06-Farewell.cover.jpeg"));
 
-        musicData.forEach(([key, value, ...rest]) => {
+        musicData.forEach(([key, ...rest]: [string, ...any[]]) => {
+            rest = rest.map((column: string) => {
+                // is Buffer
+                if (column.startsWith("__merry_go_round_buffer::")) {
+                    const [bufferKey, length] = column.split("::").slice(1);
+                    const buffer = Buffer.alloc(parseInt(length, 10));
+                    BufferManager.getInstance().readReservedBuffer(bufferKey, buffer);
+
+                    return buffer;
+                }
+
+                return column;
+            });
+
             if (key === "APIC") {
-                const [mimeType, imageType, description, bufferKey, bufferLengthString] = [value, ...rest];
-                const bufferLength = parseInt(bufferLengthString, 10);
-                const imageBuffer = Buffer.alloc(bufferLength, 0);
+                const [mimeType, imageType, description, buffer] = rest;
 
-                BufferManager.getInstance().readReservedBuffer(bufferKey, imageBuffer);
-
-                expect([value, ...rest].length).to.equal(5);
+                expect(rest.length).to.equal(4);
                 expect(mimeType).to.equal("image/jpeg");
                 expect(imageType).to.equal("Cover (front)");
                 expect(description).to.equal("");
-                assert(Buffer.compare(imageBuffer, sampleAlbumCoverData) === 0);
+                assert(Buffer.compare(buffer, sampleAlbumCoverData) === 0);
             }
         });
     });
