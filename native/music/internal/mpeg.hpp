@@ -15,11 +15,16 @@ private:
 	std::string serializeBuffer(TagLib::ByteVector& byteVector);
 	void initializeID3v2(void);
 
+private:
+	void composeAttachedPictureFrame(std::vector<std::string>& frameDataStore, TagLib::ID3v2::Frame* frame);
+	void composePrivateFrame(std::vector<std::string>& frameDataStore, TagLib::ID3v2::Frame* frame);
+
 public:
 	virtual std::string tagType(void) override;
 	virtual native_data_t nativeData(void) override;
 
 private:
+	std::unordered_map<std::string, std::function<void(std::vector<std::string>&, TagLib::ID3v2::Frame*)>> composerMap;
 	std::string tagTypeName;
 	TagLib::MPEG::File* mpegFile;
 	native_data_t native;

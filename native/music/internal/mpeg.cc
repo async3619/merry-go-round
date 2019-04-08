@@ -28,6 +28,9 @@ const char* PICTURE_TYPE_DECL[] = {
 
 MPEGMusicInternal::MPEGMusicInternal(TagLib::File* targetFile) :
 	MusicInternal(targetFile), mpegFile(reinterpret_cast<MPEG::File*>(targetFile)), tagTypeName("Unknown") {
+	this->composerMap["APIC"] = std::bind(&MPEGMusicInternal::composeAttachedPictureFrame, this, std::placeholders::_1, std::placeholders::_2);
+	this->composerMap["PRIV"] = std::bind(&MPEGMusicInternal::composePrivateFrame, this, std::placeholders::_1, std::placeholders::_2);
+
 	if (this->mpegFile->hasAPETag()) {
 		tagTypeName = "APE";
 	} else if (this->mpegFile->hasID3v2Tag()) {
@@ -63,44 +66,56 @@ void MPEGMusicInternal::initializeID3v2(void) {
 		memcpy(frameId, frame->frameID().data(), frameIdLength - 1);
 
 		frameData.emplace_back(frameId);
-		delete[] frameId;
 
-		auto id = frame->frameID();
-		if (id == "APIC") {
-			// APIC - [mimeType, imageType, description, buffer]
-			ID3v2::AttachedPictureFrame* attachedPicture = reinterpret_cast<ID3v2::AttachedPictureFrame*>(frame);
-
-			// add mine type
-			frameData.emplace_back(attachedPicture->mimeType().toCString());
-
-			// add attached image type
-			auto pictureType = attachedPicture->type();
-			auto pictureTypeDecl = PICTURE_TYPE_DECL[static_cast<std::size_t>(pictureType)];
-			frameData.emplace_back(pictureTypeDecl);
-
-			// add description
-			frameData.emplace_back(attachedPicture->description().toCString());
-
-			// add actual image data
-			auto imageData = attachedPicture->picture();
-			frameData.emplace_back(this->serializeBuffer(imageData));
-		} else if (id == "PRIV") {
-			// PRIV - [ownerIdentifier, data]
-			ID3v2::PrivateFrame* privateFrame = reinterpret_cast<ID3v2::PrivateFrame*>(frame);
-
-			// add owner identifier
-			frameData.emplace_back(privateFrame->owner().toCString());
-
-			// add data
-			auto dataBuffer = privateFrame->data();
-			frameData.emplace_back(this->serializeBuffer(dataBuffer));
+		// find composer and if succeeded to find suitable composer to compose its data,
+		// compose with it or just make it string.
+		auto& composerIterator = this->composerMap.find(frameId);
+		if (composerIterator != this->composerMap.end()) {
+			composerIterator->second(frameData, frame);
 		} else {
 			frameData.emplace_back(TO_UTF8(frame->toString().toCString()));
 		}
 
+		// frame id data isn't needed anymore, deallocate it.
+		delete[] frameId;
+
+		// push it to the result buffer.
 		this->native.push_back(frameData);
 	}
 }
+
+void MPEGMusicInternal::composeAttachedPictureFrame(std::vector<std::string>& frameDataStore, ID3v2::Frame* frame) {
+	// APIC - [mimeType, imageType, description, buffer]
+	ID3v2::AttachedPictureFrame* attachedPicture = reinterpret_cast<ID3v2::AttachedPictureFrame*>(frame);
+
+	// add mine type
+	frameDataStore.emplace_back(attachedPicture->mimeType().toCString());
+
+	// add attached image type
+	auto pictureType = attachedPicture->type();
+	auto pictureTypeDecl = PICTURE_TYPE_DECL[static_cast<std::size_t>(pictureType)];
+	frameDataStore.emplace_back(pictureTypeDecl);
+
+	// add description
+	frameDataStore.emplace_back(attachedPicture->description().toCString());
+
+	// add actual image data
+	auto imageData = attachedPicture->picture();
+	frameDataStore.emplace_back(this->serializeBuffer(imageData));
+}
+
+void MPEGMusicInternal::composePrivateFrame(std::vector<std::string>& frameDataStore, ID3v2::Frame* frame) {
+	// PRIV - [ownerIdentifier, data]
+	ID3v2::PrivateFrame* privateFrame = reinterpret_cast<ID3v2::PrivateFrame*>(frame);
+
+	// add owner identifier
+	frameDataStore.emplace_back(privateFrame->owner().toCString());
+
+	// add data
+	auto dataBuffer = privateFrame->data();
+	frameDataStore.emplace_back(this->serializeBuffer(dataBuffer));
+}
+
 native_data_t MPEGMusicInternal::nativeData(void) {
 	return this->native;
 }
