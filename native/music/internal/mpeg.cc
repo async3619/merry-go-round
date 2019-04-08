@@ -108,10 +108,3 @@ native_data_t MPEGMusicInternal::nativeData(void) {
 std::string MPEGMusicInternal::tagType(void) {
 	return this->tagTypeName;
 }
-
-#include <nbind/nbind.h>
-
-NBIND_CLASS(MPEGMusicInternal) {
-	method(nativeData);
-	method(tagType);
-}
