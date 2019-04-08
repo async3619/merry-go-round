@@ -16,7 +16,9 @@ BufferManager::BufferManager(void) {
 	}
 }
 BufferManager::~BufferManager(void) {
-
+	for (auto& item : this->bufferMap) {
+		delete[] item.second.data;
+	}
 }
 
 std::string BufferManager::generateUUID(void) {
