@@ -13,6 +13,7 @@ protected:
 
 public:
 	virtual std::string tagType(void) = 0;
+	virtual native_data_t nativeData(void) = 0;
 };
 
 #endif // MERRY_GO_ROUND_INTERNAL_HPP

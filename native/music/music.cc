@@ -84,6 +84,14 @@ std::string Music::tagType(void) {
 	return this->musicInternal->tagType();
 }
 
+native_data_t Music::nativeData(void) {
+	if (!this->retrieved) {
+		this->retrieve();
+	}
+
+	return this->musicInternal->nativeData();
+}
+
 struct TypeChecker {
 	template <typename T>
 	TypeChecker(TagLib::FileStream& f, T& callback) : 
@@ -162,4 +170,5 @@ NBIND_CLASS(Music) {
 	method(track);
 	method(type);
 	method(tagType);
+	method(nativeData);
 }

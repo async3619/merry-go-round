@@ -46,6 +46,7 @@ public:
 public:
 	const char* type(void);
 	std::string tagType(void);
+	native_data_t nativeData(void);
 
 private:
 	void retrieve(void);

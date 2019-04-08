@@ -5,9 +5,12 @@
 #define TAGLIB_STATIC
 #define BOOST_LIB_TOOLSET "vc140"
 
+#define DEBUG_LOG(x) std::cout << __FILE__ << "(" << __LINE__ << ") - [" << #x << "]: " << x << std::endl
+
 #include <iostream>
 #include <functional>
 #include <unordered_map>
+#include <vector>
 #include <type_traits>
 
 #include <taglib/fileref.h>
@@ -34,13 +37,21 @@
 #include <taglib/dsffile.h>
 #include <taglib/dsdifffile.h>
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 #include <boost/type_index.hpp>
 #include <boost/locale.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/type.hpp>
 
+#include "nbind/api.h"
+
+typedef std::vector<std::vector<std::string>> native_data_t;
+
 #include "utils.hpp"
+
+#include "buffer-manager.hpp"
 
 #include "releasable.hpp"
 #include "dictionary.hpp"
