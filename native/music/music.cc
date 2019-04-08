@@ -160,7 +160,9 @@ void Music::release(void) {
 
 #include <nbind/nbind.h>
 
-NBIND_CLASS(Music) {
+using NativeMusic = Music;
+
+NBIND_CLASS(NativeMusic) {
 	method(create);
 	method(title);
 	method(artist);
