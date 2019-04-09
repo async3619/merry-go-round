@@ -8,6 +8,7 @@ import {
     DependencyMetadataItem,
     dependencyPath,
     getDependencyName,
+    isDebug,
 } from "./utils";
 import * as path from "path";
 import * as fs from "fs-extra";
@@ -37,7 +38,9 @@ function compileDependencyMetadata(metadataItems: DependencyMetadataItem[], depe
 }
 export async function installDependency(dependencies: string[]) {
     const metadataPromises = dependencies.map<Promise<DependencyMetadata>>(async dependencyName => {
-        const dependencyDirectory = path.resolve(dependencyPath, getDependencyName(dependencyName));
+        let dependencyDirectory = path.resolve(dependencyPath, getDependencyName(dependencyName));
+        if (isDebug) dependencyDirectory += "-debug";
+
         const metaFilePath = path.resolve(dependencyDirectory, "./meta.json");
         const meta = JSON.parse((await fs.readFile(metaFilePath)).toString());
 
@@ -72,6 +75,8 @@ export async function installDependency(dependencies: string[]) {
 
     binding = binding.replace(/"%GCC_LIBRARY_PATH%"/g, JSON.stringify(GCCLibraryDirectories));
     binding = binding.replace(/"%MSVC_LIBRARY_PATH%"/, JSON.stringify(MSVCLibraryDirectories));
+
+    binding = binding.replace(/%RUNTIME_LIBRARY%/, "MultiThreaded" + (isDebug ? "Debug" : ""));
 
     await fs.writeFile(bindingPath, binding);
 }

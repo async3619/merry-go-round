@@ -13,3 +13,5 @@ CppProperties.json
 binding.gyp
 auto-top.gypi
 auto.gypi
+
+yarn-error.log

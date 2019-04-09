@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 
-import { dependencies, dependencyPath, ObjectType } from "./utils";
+import { dependencyPath, ObjectType } from "./utils";
 
 const dependencyManifestPath = path.resolve(dependencyPath, "./.manifest.json");
 
@@ -16,19 +16,8 @@ export async function readManifest(): Promise<ObjectType<string>> {
 }
 
 export async function writeManifest(dependencyName: string, versionName: string) {
-    const manifest = renewManifest(await readManifest());
+    const manifest = await readManifest();
     manifest[dependencyName] = versionName.trim();
 
     await fs.writeFile(dependencyManifestPath, JSON.stringify(manifest, null, 4));
-}
-
-export function renewManifest(manifest: ObjectType<string>): ObjectType<string> {
-    const result = { ...manifest };
-    Object.keys(result).forEach(dependencyName => {
-        if (dependencies.indexOf(dependencyName) === -1) {
-            delete result[dependencyName];
-        }
-    });
-
-    return result;
 }

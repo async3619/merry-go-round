@@ -14,11 +14,11 @@
 				["OS=='win'", {
 					"msbuild_settings": {
 						"ClCompile": {
-							"RuntimeLibrary": "MultiThreaded",
+							"RuntimeLibrary": "%RUNTIME_LIBRARY%",
 							"DisableSpecificWarnings": ["4541"]
 						},
 						"Link": {
-							"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%"
+							"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%",
 						}
 					}
 				}],

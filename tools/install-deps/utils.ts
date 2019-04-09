@@ -16,11 +16,14 @@ export interface DependencyMetadata {
     includePath: DependencyMetadataItem[];
 }
 
+export const isDebug = process.env.NODE_ENV === "debug";
 export const rootPath = path.resolve(__dirname, "../..");
 export const bindingTemplatePath = path.resolve(rootPath, "./binding.template.gyp");
 export const bindingPath = path.resolve(rootPath, "./binding.gyp");
 export const dependencyPath = path.resolve(rootPath, "deps");
-export const dependencies = nativeDependencies;
+export const dependencies = nativeDependencies.map(dependencyName => {
+    return dependencyName + (isDebug ? "/debug" : "");
+});
 export const pathDictionary: ObjectType<string> = {};
 
 export function getArtifactName(): string {
@@ -28,11 +31,16 @@ export function getArtifactName(): string {
     if (platform === "win32") platform = "windows";
     else if (platform === "darwin") platform = "osx";
 
-    return `${platform}-${process.arch}-static`;
+    return `${platform}-${process.arch}-static` + (isDebug ? "-debug" : "");
 }
 
 export function filenamifyDependencyName(dependencyName: string): string {
     return filenamify(dependencyName, { replacement: "_" });
+}
+
+export function getDependencyPath(dependencyName: string) {
+    const directoryName = getDependencyName(dependencyName) + (isDebug ? "-debug" : "");
+    return path.resolve(dependencyPath, directoryName);
 }
 
 export function getDependencyName(rawName: string): string {

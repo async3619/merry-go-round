@@ -1,15 +1,17 @@
-import * as path from "path";
 import * as fs from "fs-extra";
 import * as tar from "tar";
 
-import { dependencyPath, getDependencyName, pathDictionary } from "./utils";
+import { getDependencyPath, pathDictionary } from "./utils";
 
 export async function extractDependency(dependencyName: string) {
-    const targetDirectory = path.resolve(dependencyPath, getDependencyName(dependencyName));
+    if (!pathDictionary[dependencyName]) return;
+
+    const targetDirectory = getDependencyPath(dependencyName);
     await fs.ensureDir(targetDirectory);
 
     await tar.x({
         cwd: targetDirectory,
+        "keep-newer-files": true,
         file: pathDictionary[dependencyName],
         stripComponents: 1,
     });
