@@ -14,7 +14,8 @@
 				["OS=='win'", {
 					"msbuild_settings": {
 						"ClCompile": {
-							"RuntimeLibrary": "MultiThreaded"
+							"RuntimeLibrary": "MultiThreaded",
+							"DisableSpecificWarnings": ["4541"]
 						},
 						"Link": {
 							"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%"
