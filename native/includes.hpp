@@ -3,7 +3,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define TAGLIB_STATIC
-#define BOOST_LIB_TOOLSET "vc140"
 
 #include <iostream>
 #include <cstring>
