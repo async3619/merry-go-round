@@ -1,70 +1,132 @@
 #include "includes.hpp"
 
-#define memzero(x, t) memset(x, 0, this->allocatedSize * sizeof(t))
+template <typename char_t> 
+struct string_helper {};
 
-Encoder& Encoder::getInstance(void) {
-	static Encoder instance;
-	return instance;
-}
-
-Encoder::Encoder(void) : 
-	allocatedSize(0), multibyte(nullptr), unicode(nullptr) {
-}
-
-std::string Encoder::toMultiByte(const std::string& utf8Text) {
-	const char* rawBuffer = utf8Text.c_str();
-
-	int length = MultiByteToWideChar(CP_UTF8, NULL, rawBuffer, strlen(rawBuffer), NULL, NULL);
-
-	this->allocate(length);
-	memzero(this->unicode, wchar);
-	
-	MultiByteToWideChar(CP_UTF8, NULL, rawBuffer, strlen(rawBuffer), this->unicode, length);
-
-	length = WideCharToMultiByte(CP_ACP, NULL, unicode, -1, NULL, NULL, NULL, NULL);
-
-	this->allocate(length);
-	memzero(this->multibyte, char);
-
-	WideCharToMultiByte(CP_ACP, 0, this->unicode, -1, this->multibyte, length, NULL, NULL);
-
-	return this->multibyte;
-}
-std::string Encoder::toUTF8(const std::string& multibyteText)
-{
-	const char* rawBuffer = multibyteText.c_str();
-
-	int length = MultiByteToWideChar(CP_ACP, 0, rawBuffer, strlen(rawBuffer), NULL, NULL);
-
-	this->allocate(length);
-	memzero(this->unicode, wchar);
-
-	MultiByteToWideChar(CP_ACP, 0, rawBuffer, strlen(rawBuffer), this->unicode, length);
-
-	length = WideCharToMultiByte(CP_UTF8, 0, unicode, lstrlenW(unicode), NULL, 0, NULL, NULL);
-
-	this->allocate(length);
-	memzero(this->multibyte, char);
-
-	WideCharToMultiByte(CP_UTF8, 0, unicode, lstrlenW(unicode), this->multibyte, length, NULL, NULL);
-
-	return this->multibyte;
-}
-
-void Encoder::allocate(size_t desiredSize)
-{
-	if (desiredSize < this->allocatedSize) 
-		return;
-
-	size_t size = 1;
-	while (true) {
-		size *= 2;
-	
-		if (desiredSize < size)
-			break;
+template <>
+struct string_helper<char> {
+	static size_t strlen(const char* string) {
+		return std::strlen(string);
 	}
+};
 
-	this->allocatedSize = size;
-	this->multibyte = new char[size];
-	this->unicode = new wchar[size];
+template <>
+struct string_helper<wchar_t> {
+	static size_t strlen(const wchar_t* string) {
+		return std::wcslen(string);
+	}
+};
+
+template <typename data_t>
+struct global_buffer_t {
+private:
+	static data_t* buffer;
+	static std::size_t length;
+
+public:
+	static data_t* allocate(std::size_t length) {
+		if (length < global_buffer_t::length) {
+			goto returning;
+		}
+
+		std::size_t nearestLength = 1;
+		while (length >= nearestLength) {
+			nearestLength *= 2;
+		}
+
+		if (global_buffer_t::buffer) {
+			delete[] global_buffer_t::buffer;
+		}
+
+		global_buffer_t::buffer = new data_t[nearestLength];
+		global_buffer_t::length = nearestLength;
+
+returning:
+		std::memset(global_buffer_t::buffer, 0, sizeof(data_t) * global_buffer_t::length);
+		return global_buffer_t::buffer;
+	}
+};
+
+template <> char* global_buffer_t<char>::buffer = nullptr;
+template <> std::size_t global_buffer_t<char>::length = 0;
+
+template <> wchar_t* global_buffer_t<wchar_t>::buffer = nullptr;
+template <> std::size_t global_buffer_t<wchar_t>::length = 0;
+
+unmanaged_wide_to_multibyte_t::result_t unmanaged_wide_to_multibyte_t::convert(const input_t* input) {
+	using scope_t = unmanaged_wide_to_multibyte_t;
+
+	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
+	int outputLength = WideCharToMultiByte(CP_ACP, 0, input, inputLength, NULL, 0, NULL, NULL);
+	scope_t::result_t output = global_buffer_t<scope_t::output_t>::allocate(outputLength);
+
+	WideCharToMultiByte(CP_ACP, 0, input, inputLength, output, outputLength, NULL, NULL);
+
+	return output;
+}
+unmanaged_wide_to_utf8_t::result_t unmanaged_wide_to_utf8_t::convert(const input_t* input) {
+	using scope_t = unmanaged_wide_to_utf8_t;
+
+	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
+	int outputLength = WideCharToMultiByte(CP_UTF8, 0, input, inputLength, NULL, 0, NULL, NULL);
+	scope_t::result_t output = global_buffer_t<scope_t::output_t>::allocate(inputLength);
+
+	WideCharToMultiByte(CP_UTF8, 0, input, inputLength, output, outputLength, NULL, NULL);
+
+	return output;
+}
+
+unmanaged_multibyte_to_wide_t::result_t unmanaged_multibyte_to_wide_t::convert(const input_t* input) {
+	using scope_t = unmanaged_multibyte_to_wide_t;
+
+	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
+	int outputLength = MultiByteToWideChar(CP_ACP, 0, input, inputLength, NULL, NULL);
+
+	scope_t::result_t output = global_buffer_t<scope_t::output_t>::allocate(outputLength);
+	MultiByteToWideChar(CP_ACP, 0, input, inputLength, output, outputLength);
+
+	return output;
+}
+unmanaged_multibyte_to_utf8_t::result_t unmanaged_multibyte_to_utf8_t::convert(const input_t* input) {
+	unmanaged_multibyte_to_wide_t::result_t data = unmanaged_multibyte_to_wide_t::convert(input);
+	return unmanaged_wide_to_utf8_t::convert(data);
+}
+
+unmanaged_utf8_to_wide_t::result_t unmanaged_utf8_to_wide_t::convert(const input_t* input) {
+	using scope_t = unmanaged_utf8_to_wide_t;
+
+	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
+	std::size_t outputLength = MultiByteToWideChar(CP_UTF8, 0, input, inputLength, NULL, NULL);
+	scope_t::result_t output = global_buffer_t<scope_t::output_t>::allocate(outputLength);
+
+	MultiByteToWideChar(CP_UTF8, 0, input, inputLength, output, outputLength);
+
+	return output;
+}
+unmanaged_utf8_to_multibyte_t::result_t unmanaged_utf8_to_multibyte_t::convert(const input_t* input) {
+	unmanaged_utf8_to_wide_t::result_t data = unmanaged_utf8_to_wide_t::convert(input);
+	return unmanaged_wide_to_multibyte_t::convert(data);
+}
+
+#define IMPL_CODE_CVT_MANAGED(x) x::result_t x::convert(const input_t* input) { return x::inverse_t::convert(input); }
+
+IMPL_CODE_CVT_MANAGED(multibyte_to_wide_t);
+IMPL_CODE_CVT_MANAGED(multibyte_to_utf8_t);
+IMPL_CODE_CVT_MANAGED(wide_to_multibyte_t);
+IMPL_CODE_CVT_MANAGED(wide_to_utf8_t);
+IMPL_CODE_CVT_MANAGED(utf8_to_wide_t);
+IMPL_CODE_CVT_MANAGED(utf8_to_multibyte_t);
+
+utf8_t::managed_t code_cvt_helper<TagLib::String>::toUtf8(const TagLib::String& ref) {
+	// check if given string object is unicode.
+	// if it's already a unicode string, that means it has own utf-8/16 string. 
+	// (which is at least wchar_t on windows)
+	bool isUnicode = !(ref.isAscii() || ref.isLatin1());
+
+	// call most suitable code converter.
+	if (isUnicode) {
+		return wide_to_utf8_t::convert(ref.toCWString());
+	} else {
+		return multibyte_to_utf8_t::convert(ref.toCString());
+	}
 }

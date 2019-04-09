@@ -5,9 +5,8 @@
 #define TAGLIB_STATIC
 #define BOOST_LIB_TOOLSET "vc140"
 
-#define DEBUG_LOG(x) std::cout << __FILE__ << "(" << __LINE__ << ") - [" << #x << "]: " << x << std::endl
-
 #include <iostream>
+#include <cstring>
 #include <functional>
 #include <unordered_map>
 #include <vector>
@@ -51,6 +50,7 @@
 typedef std::vector<std::vector<std::string>> native_data_t;
 
 #include "utils.hpp"
+#include "debug.hpp"
 
 #include "buffer-manager.hpp"
 

@@ -73,7 +73,7 @@ void MPEGMusicInternal::initializeID3v2(void) {
 		if (composerIterator != this->composerMap.end()) {
 			composerIterator->second(frameData, frame);
 		} else {
-			frameData.emplace_back(TO_UTF8(frame->toString().toCString()));
+			frameData.emplace_back(TAGLIB_STRING_TO_UTF8(frame->toString()));
 		}
 
 		// frame id data isn't needed anymore, deallocate it.
@@ -89,7 +89,7 @@ void MPEGMusicInternal::composeAttachedPictureFrame(std::vector<std::string>& fr
 	ID3v2::AttachedPictureFrame* attachedPicture = reinterpret_cast<ID3v2::AttachedPictureFrame*>(frame);
 
 	// add mine type
-	frameDataStore.emplace_back(attachedPicture->mimeType().toCString());
+	frameDataStore.emplace_back(TAGLIB_STRING_TO_UTF8(attachedPicture->mimeType()));
 
 	// add attached image type
 	auto pictureType = attachedPicture->type();
@@ -97,7 +97,7 @@ void MPEGMusicInternal::composeAttachedPictureFrame(std::vector<std::string>& fr
 	frameDataStore.emplace_back(pictureTypeDecl);
 
 	// add description
-	frameDataStore.emplace_back(attachedPicture->description().toCString());
+	frameDataStore.emplace_back(TAGLIB_STRING_TO_UTF8(attachedPicture->description()));
 
 	// add actual image data
 	auto imageData = attachedPicture->picture();
@@ -109,7 +109,7 @@ void MPEGMusicInternal::composePrivateFrame(std::vector<std::string>& frameDataS
 	ID3v2::PrivateFrame* privateFrame = reinterpret_cast<ID3v2::PrivateFrame*>(frame);
 
 	// add owner identifier
-	frameDataStore.emplace_back(privateFrame->owner().toCString());
+	frameDataStore.emplace_back(TAGLIB_STRING_TO_UTF8(privateFrame->owner()));
 
 	// add data
 	auto dataBuffer = privateFrame->data();

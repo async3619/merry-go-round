@@ -47,16 +47,16 @@ Music::Music(const std::string& path) :
 Music::~Music(void) {}
 
 std::string Music::title(void) const {
-	return TO_UTF8(this->tag->title().toCString());
+	return TAGLIB_STRING_TO_UTF8(this->tag->title());
 }
 std::string Music::artist(void) const {
-	return TO_UTF8(this->tag->artist().toCString());
+	return TAGLIB_STRING_TO_UTF8(this->tag->artist());
 }
 std::string Music::album(void) const {
-	return TO_UTF8(this->tag->album().toCString());
+	return TAGLIB_STRING_TO_UTF8(this->tag->album());
 }
 std::string Music::genre(void) const {
-	return TO_UTF8(this->tag->genre().toCString());
+	return TAGLIB_STRING_TO_UTF8(this->tag->genre());
 }
 unsigned int Music::year(void) const {
 	return this->tag->year();
