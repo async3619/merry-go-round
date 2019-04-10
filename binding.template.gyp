@@ -17,7 +17,7 @@
 							"msbuild_settings": {
 								"ClCompile": {
 									"RuntimeLibrary": "MultiThreadedDebug",
-									"DisableSpecificWarnings": ["4541"],
+									"DisableSpecificWarnings": ["4541", "4291"],
 									"Optimization": "Disabled"
 								},
 								"Link": {
