@@ -74,9 +74,7 @@ export async function installDependency(dependencies: string[]) {
     const MSVCLibraryDirectories: string[] = libraryDirectories;
 
     binding = binding.replace(/"%GCC_LIBRARY_PATH%"/g, JSON.stringify(GCCLibraryDirectories));
-    binding = binding.replace(/"%MSVC_LIBRARY_PATH%"/, JSON.stringify(MSVCLibraryDirectories));
-
-    binding = binding.replace(/%RUNTIME_LIBRARY%/, "MultiThreaded" + (isDebug ? "Debug" : ""));
+    binding = binding.replace(/"%MSVC_LIBRARY_PATH%"/g, JSON.stringify(MSVCLibraryDirectories));
 
     await fs.writeFile(bindingPath, binding);
 }

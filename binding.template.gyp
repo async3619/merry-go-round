@@ -12,13 +12,30 @@
 			],
 			"conditions": [
 				["OS=='win'", {
-					"msbuild_settings": {
-						"ClCompile": {
-							"RuntimeLibrary": "%RUNTIME_LIBRARY%",
-							"DisableSpecificWarnings": ["4541"]
+					"configurations": {
+						"Debug": {
+							"msbuild_settings": {
+								"ClCompile": {
+									"RuntimeLibrary": "MultiThreadedDebug",
+									"DisableSpecificWarnings": ["4541"],
+									"Optimization": "Disabled"
+								},
+								"Link": {
+									"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%",
+									"GenerateDebugInformation": "true"
+								}
+							}
 						},
-						"Link": {
-							"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%",
+						"Release": {
+							"msbuild_settings": {
+								"ClCompile": {
+									"RuntimeLibrary": "MultiThreaded",
+									"DisableSpecificWarnings": ["4541"]
+								},
+								"Link": {
+									"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%"
+								}
+							}
 						}
 					}
 				}],
