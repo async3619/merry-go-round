@@ -23,10 +23,9 @@
         "build": "node-gyp configure build",
         "install-deps": "ts-node ./tools/install-deps",
         "clean": "rimraf dist build",
-        "dev": "ts-node  ./_test.ts",
         "test": "cross-env mocha -r ts-node/register test/**/*.spec.ts",
         "predebug": "cross-env NODE_ENV=debug yarn install-deps && node-gyp configure build --debug",
-        "debug": "node ./debug.js"
+        "debug": "ts-node ./debug.js"
     },
     "dependencies": {
         "autogypi": "^0.2.2",
