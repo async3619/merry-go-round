@@ -12,12 +12,8 @@
     "author": "Sophia <async3619@naver.com>",
     "license": "MIT",
     "scripts": {
-        "autogypi": "autogypi",
         "node-gyp": "node-gyp",
-        "ndts": "ndts",
-        "install": "autogypi && yarn install-deps && yarn compile",
-        "type-gen": "npm run -s -- ndts . > ./src/lib-types.d.ts",
-        "precompile": "yarn build && yarn type-gen",
+        "install": "yarn install-deps && yarn compile",
         "compile": "tsc --project \"./tsconfig.build.json\" -m esnext --outDir dist/esnext && tsc --project \"./tsconfig.build.json\" -m commonjs --outDir dist/commonjs",
         "postcompile": "cpx ./src/lib-types.d.ts ./dist/commonjs && cpx src/lib-types.d.ts dist/esnext",
         "build": "node-gyp configure build",
@@ -27,8 +23,7 @@
         "build:debug": "cross-env NODE_ENV=debug yarn install-deps && node-gyp configure build --debug -nodedir=\"D:\\node-v10.15.3\""
     },
     "dependencies": {
-        "autogypi": "^0.2.2",
-        "nbind": "^0.3.15",
+        "node-addon-api": "*",
         "node-gyp": "^3.8.0"
     },
     "devDependencies": {

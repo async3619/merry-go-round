@@ -56,6 +56,8 @@ export async function installDependency(dependencies: string[]) {
         libraryPath: flatten(metadataArray.map(m => m.libraryPath)),
     };
 
+    metadata.includePath.push("<!@(node -p \\\"require('node-addon-api').include\\\")");
+
     let binding = (await fs.readFile(bindingTemplatePath)).toString();
     binding = binding.replace(/"%INCLUDE_PATH%"/g, JSON.stringify(metadata.includePath));
 
