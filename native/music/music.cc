@@ -21,6 +21,8 @@ const char* FILE_TYPE_STRINGS[] = {
 };
 
 Music* Music::create(std::string path) {
+	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
+
 	static Dictionary<std::string, Music*> dictionary;
 	CONV_ARGUMENT_ENCODING(path);
 
@@ -44,19 +46,23 @@ Music::Music(const std::string& path) :
 	this->file = new TagLib::FileRef(&this->stream);
 	this->tag = file->tag();
 }
-Music::~Music(void) {}
+Music::~Music(void) {
+	delete this->file;
+	if (this->musicInternal)
+		delete this->musicInternal;
+}
 
-std::string Music::title(void) const {
-	return TAGLIB_STRING_TO_UTF8(this->tag->title());
+node_string_t Music::title(void) const {
+	return NODE_STRING(this->tag->title());
 }
-std::string Music::artist(void) const {
-	return TAGLIB_STRING_TO_UTF8(this->tag->artist());
+node_string_t Music::artist(void) const {
+	return NODE_STRING(this->tag->artist());
 }
-std::string Music::album(void) const {
-	return TAGLIB_STRING_TO_UTF8(this->tag->album());
+node_string_t Music::album(void) const {
+	return NODE_STRING(this->tag->album());
 }
-std::string Music::genre(void) const {
-	return TAGLIB_STRING_TO_UTF8(this->tag->genre());
+node_string_t Music::genre(void) const {
+	return NODE_STRING(this->tag->genre());
 }
 unsigned int Music::year(void) const {
 	return this->tag->year();
@@ -158,7 +164,7 @@ void Music::release(void) {
 	delete this;
 }
 
-#include <nbind/nbind.h>
+#include "../nbind.hpp"
 
 using NativeMusic = Music;
 

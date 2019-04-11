@@ -1,4 +1,4 @@
-#include "includes.hpp"
+#include "../includes.hpp"
 
 BufferInformation::BufferInformation(const byte_t* data, std::size_t length) :
 	data(data), length(length) { }
@@ -40,6 +40,7 @@ std::string BufferManager::generateUUID(void) {
 		sprintf(result, "%s%s%s", result, this->byteToHex[bytes[i]].c_str(), needHyphen ? "-" : "");
 	}
 
+	delete[] bytes;
 	return result;
 }
 
@@ -70,7 +71,7 @@ void BufferManager::readReservedBuffer(std::string key, nbind::Buffer targetBuff
 	std::memcpy(targetBuffer.data(), bufferInformation.data, bufferInformation.length);
 }
 
-#include <nbind/nbind.h>
+#include "../nbind.hpp"
 
 NBIND_CLASS(BufferManager) {
 	method(getInstance);

@@ -1,125 +1,158 @@
 #include "../../includes.hpp"
 
-using namespace TagLib;
-
-const char* PICTURE_TYPE_DECL[] = {
-	"Other",
-	"File icon",
-	"Other file icon",
-	"Cover (front)",
-	"Cover (back)",
-	"Leaflet page",
-	"Media",
-	"Lead artist / Lead performer / Soloist",
-	"Artist / Performer",
-	"Conductor",
-	"Band / Orchestra",
-	"Composer",
-	"Lyricist / Text writer",
-	"Recording location",
-	"During recording",
-	"During performance",
-	"Movie / Video screen capture",
-	"A bright coloured fish",
-	"Illustration",
-	"Band / Artist logotype",
-	"Publisher / Studio logotype",
+std::unordered_map<ID3v2AttachedPictureFrame::Type, const char*> MPEGMusicInternal::idv2PictureTypeDictionary = {
+	//! A type not enumerated below
+	{ ID3v2AttachedPictureFrame::Other, "Other" },
+	//! 32x32 PNG image that should be used as the file icon
+	{ ID3v2AttachedPictureFrame::FileIcon, "File Icon" },
+	//! File icon of a different size or format
+	{ ID3v2AttachedPictureFrame::OtherFileIcon, "Other File Icon" },
+	//! Front cover image of the album
+	{ ID3v2AttachedPictureFrame::FrontCover, "Front Cover" },
+	//! Back cover image of the album
+	{ ID3v2AttachedPictureFrame::BackCover, "Back Cover" },
+	//! Inside leaflet page of the album
+	{ ID3v2AttachedPictureFrame::LeafletPage, "Leaflet Page" },
+	//! Image from the album itself
+	{ ID3v2AttachedPictureFrame::Media, "Media" },
+	//! Picture of the lead artist or soloist
+	{ ID3v2AttachedPictureFrame::LeadArtist, "Lead Artist" },
+	//! Picture of the artist or performer
+	{ ID3v2AttachedPictureFrame::Artist, "Artist" },
+	//! Picture of the conductor
+	{ ID3v2AttachedPictureFrame::Conductor, "Conductor" },
+	//! Picture of the band or orchestra
+	{ ID3v2AttachedPictureFrame::Band, "Band" },
+	//! Picture of the composer
+	{ ID3v2AttachedPictureFrame::Composer, "Composer" },
+	//! Picture of the lyricist or text writer
+	{ ID3v2AttachedPictureFrame::Lyricist, "Lyricist" },
+	//! Picture of the recording location or studio
+	{ ID3v2AttachedPictureFrame::RecordingLocation, "Recording Location" },
+	//! Picture of the artists during recording
+	{ ID3v2AttachedPictureFrame::DuringRecording, "During Recording" },
+	//! Picture of the artists during performance
+	{ ID3v2AttachedPictureFrame::DuringPerformance, "During Performance" },
+	//! Picture from a movie or video related to the track
+	{ ID3v2AttachedPictureFrame::MovieScreenCapture, "Movie Screen Capture" },
+	//! Picture of a large, coloured fish
+	{ ID3v2AttachedPictureFrame::ColouredFish, "Coloured Fish" },
+	//! Illustration related to the track
+	{ ID3v2AttachedPictureFrame::Illustration, "Illustration" },
+	//! Logo of the band or performer
+	{ ID3v2AttachedPictureFrame::BandLogo, "Band Logo" },
+	//! Logo of the publisher (record company)
+	{ ID3v2AttachedPictureFrame::PublisherLogo, "Publisher Logo" },
 };
 
-MPEGMusicInternal::MPEGMusicInternal(TagLib::File* targetFile) :
-	MusicInternal(targetFile), mpegFile(reinterpret_cast<MPEG::File*>(targetFile)), tagTypeName("Unknown") {
-	this->composerMap["APIC"] = std::bind(&MPEGMusicInternal::composeAttachedPictureFrame, this, std::placeholders::_1, std::placeholders::_2);
-	this->composerMap["PRIV"] = std::bind(&MPEGMusicInternal::composePrivateFrame, this, std::placeholders::_1, std::placeholders::_2);
-
-	if (this->mpegFile->hasAPETag()) {
-		tagTypeName = "APE";
-	} else if (this->mpegFile->hasID3v2Tag()) {
-		this->initializeID3v2();
-	} else if (this->mpegFile->hasID3v1Tag()) {
-		tagTypeName = "ID3v1";
-	}
+MPEGMusicInternal::MPEGMusicInternal(TagLib::File* file) :
+	MusicInternal(file), file(reinterpret_cast<TagLib::MPEG::File*>(file)), type(nullptr) {
+	idv2Resolvers["APIC"] = std::bind(&MPEGMusicInternal::resolveIdv2AttachedPicture, this, std::placeholders::_1, std::placeholders::_2);
+	idv2Resolvers["PRIV"] = std::bind(&MPEGMusicInternal::resolveIdv2Private, this, std::placeholders::_1, std::placeholders::_2);
 }
 MPEGMusicInternal::~MPEGMusicInternal(void) { }
 
-std::string MPEGMusicInternal::serializeBuffer(TagLib::ByteVector& byteVector) {
-	auto bufferKey = BufferManager::getInstance().reserve(byteVector.data(), byteVector.size());
-	std::string data = "__merry_go_round_buffer::" + bufferKey + "::" + std::to_string(byteVector.size());
+void MPEGMusicInternal::retrieveID3v2TagData(void) {
+	TagLib::ID3v2::Tag* tag = this->file->ID3v2Tag();
 
-	return data;
-}
-
-void MPEGMusicInternal::initializeID3v2(void) {
-	ID3v2::Tag* tag = this->mpegFile->ID3v2Tag();
-	auto* header = tag->header();
-
-	this->tagTypeName = "ID3v2.";
-	this->tagTypeName += std::to_string(header->majorVersion());
-
-	auto frameList = tag->frameList();
-	for (ID3v2::Frame* frame : frameList) {
-		std::vector<std::string> frameData;
+	const auto& frameList = tag->frameList();
+	for (auto* frame : frameList) {
+		string_array_t frameData;
 
 		// add frame id
-		size_t frameIdLength = frame->frameID().size() + 1;
-		char* frameId = new char[frameIdLength];
-		memset(frameId, 0, frameIdLength);
-		memcpy(frameId, frame->frameID().data(), frameIdLength - 1);
+		char frameId[5] = { 0, };
+		std::memcpy(frameId, frame->frameID().mid(0, 4).data(), sizeof(char) * 4);
+		frameId[4] = '\0';
 
-		frameData.emplace_back(frameId);
+		frameData.push_back(NODE_STRING(frameId));
 
-		// find composer and if succeeded to find suitable composer to compose its data,
-		// compose with it or just make it string.
-		auto& composerIterator = this->composerMap.find(frameId);
-		if (composerIterator != this->composerMap.end()) {
-			composerIterator->second(frameData, frame);
+		// add frame data
+		if (this->idv2Resolvers.find(frameId) != this->idv2Resolvers.cend()) {
+			this->idv2Resolvers[frameId](frameData, frame);
 		} else {
-			frameData.emplace_back(TAGLIB_STRING_TO_UTF8(frame->toString()));
+			// add data as string
+			frameData.push_back(NODE_STRING(frame->toString()));
 		}
 
-		// frame id data isn't needed anymore, deallocate it.
-		delete[] frameId;
+		// add to data store
+		this->data.push_back(frameData);
+	}
+}
+void MPEGMusicInternal::generateNativeData(void) {
+	if (!this->data.empty())
+		this->data.clear();
 
-		// push it to the result buffer.
-		this->native.push_back(frameData);
+	if (this->file->hasID3v2Tag()) {
+		this->retrieveID3v2TagData();
+	} else {
 	}
 }
 
-void MPEGMusicInternal::composeAttachedPictureFrame(std::vector<std::string>& frameDataStore, ID3v2::Frame* frame) {
+void MPEGMusicInternal::resolveIdv2AttachedPicture(string_array_t& arr, ID3v2Frame* frame) {
+	using TagLib::ID3v2::AttachedPictureFrame;
+
 	// APIC - [mimeType, imageType, description, buffer]
-	ID3v2::AttachedPictureFrame* attachedPicture = reinterpret_cast<ID3v2::AttachedPictureFrame*>(frame);
+	auto* attachedPictureFrame = reinterpret_cast<AttachedPictureFrame*>(frame);
 
-	// add mine type
-	frameDataStore.emplace_back(TAGLIB_STRING_TO_UTF8(attachedPicture->mimeType()));
+	// add mime type
+	arr.push_back(NODE_STRING(attachedPictureFrame->mimeType()));
 
-	// add attached image type
-	auto pictureType = attachedPicture->type();
-	auto pictureTypeDecl = PICTURE_TYPE_DECL[static_cast<std::size_t>(pictureType)];
-	frameDataStore.emplace_back(pictureTypeDecl);
+	// add image type
+	arr.push_back(NODE_STRING(MPEGMusicInternal::idv2PictureTypeDictionary[attachedPictureFrame->type()]));
 
 	// add description
-	frameDataStore.emplace_back(TAGLIB_STRING_TO_UTF8(attachedPicture->description()));
+	arr.push_back(NODE_STRING(attachedPictureFrame->description()));
 
-	// add actual image data
-	auto imageData = attachedPicture->picture();
-	frameDataStore.emplace_back(this->serializeBuffer(imageData));
+	// add buffer
+	auto pictureBuffer = attachedPictureFrame->picture();
+	auto&& bufferId = BufferManager::getInstance().reserve(pictureBuffer.data(), pictureBuffer.size());
+
+	arr.push_back(NODE_STRING("__merry_go_round_buffer::" + bufferId + "::" + std::to_string(pictureBuffer.size())));
 }
+void MPEGMusicInternal::resolveIdv2Private(string_array_t& arr, ID3v2Frame* frame) {
+	using TagLib::ID3v2::PrivateFrame;
 
-void MPEGMusicInternal::composePrivateFrame(std::vector<std::string>& frameDataStore, ID3v2::Frame* frame) {
 	// PRIV - [ownerIdentifier, data]
-	ID3v2::PrivateFrame* privateFrame = reinterpret_cast<ID3v2::PrivateFrame*>(frame);
+	auto* privateFrame = reinterpret_cast<PrivateFrame*>(frame);
 
 	// add owner identifier
-	frameDataStore.emplace_back(TAGLIB_STRING_TO_UTF8(privateFrame->owner()));
+	arr.push_back(NODE_STRING(privateFrame->owner()));
 
 	// add data
 	auto dataBuffer = privateFrame->data();
-	frameDataStore.emplace_back(this->serializeBuffer(dataBuffer));
+	auto&& bufferId = BufferManager::getInstance().reserve(dataBuffer.data(), dataBuffer.size());
+
+	arr.push_back(NODE_STRING("__merry_go_round_buffer::" + bufferId + "::" + std::to_string(dataBuffer.size())));
 }
 
+node_string_t MPEGMusicInternal::tagType(void) {
+	if (!this->type) {
+		if (this->file->hasID3v2Tag()) {
+			std::string version("ID3v2.");
+			TagLib::ID3v2::Tag* tag = this->file->ID3v2Tag();
+
+			if (!tag)
+				goto unknown;
+
+			auto* header = tag->header();
+			version += std::to_string(header->majorVersion());
+
+			this->type = NODE_STRING(version.c_str());
+		} else if (this->file->hasID3v1Tag()) {
+			this->type = NODE_STRING("ID3v1");
+		} else if (this->file->hasAPETag()) {
+			this->type = NODE_STRING("APE");
+		} else {
+		unknown:
+			this->type = NODE_STRING("Unknown");
+		}
+	}
+
+	return this->type;
+}
 native_data_t MPEGMusicInternal::nativeData(void) {
-	return this->native;
-}
+	if (this->data.empty())
+		this->generateNativeData();
 
-std::string MPEGMusicInternal::tagType(void) {
-	return this->tagTypeName;
+	return this->data;
 }

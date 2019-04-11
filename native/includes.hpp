@@ -44,18 +44,19 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/type.hpp>
 
-#include "nbind/api.h"
-
-typedef std::vector<std::vector<std::string>> native_data_t;
-
-#include "utils.hpp"
-#include "debug.hpp"
-
-#include "buffer-manager.hpp"
+#include <nbind/api.h>
 
 #include "releasable.hpp"
+
+#include "utils/utils.hpp"
+#include "debug/debug.hpp"
+
+#include "utils/buffer-manager.hpp"
+#include "utils/string-manager.hpp"
+#include "utils/encoder.hpp"
+
+#include "object.hpp"
 #include "dictionary.hpp"
-#include "encoder.hpp"
 
 #include "music/internal/internal.hpp"
 #include "music/internal/mpeg.hpp"

@@ -1,4 +1,4 @@
-#include "includes.hpp"
+#include "../includes.hpp"
 
 template <typename char_t> 
 struct string_helper {};
@@ -20,6 +20,7 @@ struct string_helper<wchar_t> {
 template <typename data_t>
 struct global_buffer_t {
 private:
+	static Watcher watch;
 	static data_t* buffer;
 	static std::size_t length;
 
@@ -34,6 +35,7 @@ public:
 			nearestLength *= 2;
 		}
 
+		void* data = global_buffer_t::buffer;
 		if (global_buffer_t::buffer) {
 			delete[] global_buffer_t::buffer;
 		}
@@ -47,9 +49,11 @@ returning:
 	}
 };
 
+template <> Watcher global_buffer_t<char>::watch([]() { delete[] global_buffer_t<char>::buffer; });
 template <> char* global_buffer_t<char>::buffer = nullptr;
 template <> std::size_t global_buffer_t<char>::length = 0;
 
+template <> Watcher global_buffer_t<wchar_t>::watch([]() { delete[] global_buffer_t<wchar_t>::buffer; });
 template <> wchar_t* global_buffer_t<wchar_t>::buffer = nullptr;
 template <> std::size_t global_buffer_t<wchar_t>::length = 0;
 
@@ -69,7 +73,7 @@ unmanaged_wide_to_utf8_t::result_t unmanaged_wide_to_utf8_t::convert(const input
 
 	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
 	int outputLength = WideCharToMultiByte(CP_UTF8, 0, input, inputLength, NULL, 0, NULL, NULL);
-	scope_t::result_t output = global_buffer_t<scope_t::output_t>::allocate(inputLength);
+	scope_t::result_t output = global_buffer_t<scope_t::output_t>::allocate(outputLength);
 
 	WideCharToMultiByte(CP_UTF8, 0, input, inputLength, output, outputLength, NULL, NULL);
 
@@ -117,16 +121,30 @@ IMPL_CODE_CVT_MANAGED(wide_to_utf8_t);
 IMPL_CODE_CVT_MANAGED(utf8_to_wide_t);
 IMPL_CODE_CVT_MANAGED(utf8_to_multibyte_t);
 
-utf8_t::managed_t code_cvt_helper<TagLib::String>::toUtf8(const TagLib::String& ref) {
+template <>
+utf8_t::elem_t* code_cvt_helper::toUtf8<TagLib::String>(TagLib::String&& ref) {
 	// check if given string object is unicode.
 	// if it's already a unicode string, that means it has own utf-8/16 string. 
 	// (which is at least wchar_t on windows)
 	bool isUnicode = !(ref.isAscii() || ref.isLatin1());
+	char* result = nullptr;
 
 	// call most suitable code converter.
 	if (isUnicode) {
-		return wide_to_utf8_t::convert(ref.toCWString());
+		result = unmanaged_wide_to_utf8_t::convert(ref.toCWString());
 	} else {
-		return multibyte_to_utf8_t::convert(ref.toCString());
+		result = unmanaged_multibyte_to_utf8_t::convert(ref.toCString());
 	}
+
+	return result;
+}
+
+template <>
+utf8_t::elem_t* code_cvt_helper::toUtf8<std::string>(std::string&& ref) {
+	return unmanaged_multibyte_to_utf8_t::convert(ref.c_str());
+}
+
+template <>
+utf8_t::elem_t* code_cvt_helper::toUtf8<char>(const char* ref) {
+	return unmanaged_multibyte_to_utf8_t::convert(ref);
 }

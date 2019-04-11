@@ -30,9 +30,17 @@ typedef unmanaged_multibyte_to_utf8_t::inverse_t multibyte_to_utf8_t;
 typedef unmanaged_utf8_to_wide_t::inverse_t utf8_to_wide_t;
 typedef unmanaged_utf8_to_multibyte_t::inverse_t utf8_to_multibyte_t;
 
-template <class T>
+template <typename T>
+struct pure_type {
+	typedef typename std::remove_const<typename std::remove_pointer<T>::type>::type type;
+};
+
 struct code_cvt_helper {
-	static utf8_t::managed_t toUtf8(const T& ref);
+	template <class T>
+	static std::enable_if_t<std::is_class<typename pure_type<T>::type>::value, utf8_t::elem_t*> toUtf8(T&& ref);
+
+	template <class T>
+	static std::enable_if_t<!std::is_class<typename pure_type<T>::type>::value, utf8_t::elem_t*> toUtf8(const T* ref);
 };
 
 // convert node.js string type (utf-8) to normal string (ASCII/ANSI)

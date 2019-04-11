@@ -3,9 +3,6 @@
 
 class Releasable
 {
-private:
-	DISALLOW_COPY_AND_ASSIGN(Releasable);
-
 protected:
 	Releasable(void) = default;
 	~Releasable(void) = default;

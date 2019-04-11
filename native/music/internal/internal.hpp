@@ -1,18 +1,20 @@
 #ifndef MERRY_GO_ROUND_INTERNAL_HPP
 #define MERRY_GO_ROUND_INTERNAL_HPP
 
-class MusicInternal 
-{
-private:
-	DISALLOW_COPY_AND_ASSIGN(MusicInternal);
-	MusicInternal(void) = delete;
+typedef std::vector<std::vector<node_string_t>> native_data_t;
 
+class MusicInternal : public Object
+{
 protected:
+	MusicInternal(void) = delete;
+	MusicInternal(MusicInternal&) = delete;
 	MusicInternal(TagLib::File*);
+
+public:
 	virtual ~MusicInternal(void) = 0;
 
 public:
-	virtual std::string tagType(void) = 0;
+	virtual node_string_t tagType(void) = 0;
 	virtual native_data_t nativeData(void) = 0;
 };
 

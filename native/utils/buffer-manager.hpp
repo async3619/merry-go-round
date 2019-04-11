@@ -1,7 +1,7 @@
 #ifndef MERRY_GO_ROUND_BUFFER_MANAGER_HPP
 #define MERRY_GO_ROUND_BUFFER_MANAGER_HPP
 
-typedef unsigned char	byte_t;
+typedef unsigned char byte_t;
 
 struct BufferInformation 
 {

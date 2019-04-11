@@ -7,6 +7,7 @@ deps/
 
 src/lib-types.d.ts
 _test.ts
+debug.js
 
 CppProperties.json
 

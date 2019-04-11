@@ -1,7 +1,7 @@
 #ifndef MERRY_GO_ROUND_MUSIC_HPP
 #define MERRY_GO_ROUND_MUSIC_HPP
 
-class Music : public Releasable
+class Music : public Releasable, Object
 {
 private:
 	DISALLOW_COPY_AND_ASSIGN(Music);
@@ -36,10 +36,10 @@ private:
 	~Music(void);
 
 public:
-	std::string title(void) const;
-	std::string artist(void) const;
-	std::string album(void) const;
-	std::string genre(void) const;
+	node_string_t title(void) const;
+	node_string_t artist(void) const;
+	node_string_t album(void) const;
+	node_string_t genre(void) const;
 	unsigned int year(void) const;
 	unsigned int track(void) const;
 
