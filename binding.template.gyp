@@ -17,7 +17,7 @@
 									"RuntimeLibrary": "MultiThreadedDebug",
 									"DisableSpecificWarnings": ["4541", "4291"],
 									"Optimization": "Disabled",
-									"ExceptionHandling": "1"
+									"ExceptionHandling": "Sync"
 								},
 								"Link": {
 									"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%",
@@ -30,7 +30,7 @@
 								"ClCompile": {
 									"RuntimeLibrary": "MultiThreaded",
 									"DisableSpecificWarnings": ["4541"],
-									"ExceptionHandling": "1"
+									"ExceptionHandling": "Sync"
 								},
 								"Link": {
 									"AdditionalLibraryDirectories": "%MSVC_LIBRARY_PATH%"
