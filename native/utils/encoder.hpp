@@ -43,10 +43,13 @@ struct code_cvt_helper {
 	static std::enable_if_t<!std::is_class<typename pure_type<T>::type>::value, utf8_t::elem_t*> toUtf8(const T* ref);
 };
 
+#define _TO_UTF8(x, type) code_cvt_helper::toUtf8<type>(x)
+#define TO_UTF8(x) code_cvt_helper::toUtf8(x)
+
 // convert node.js string type (utf-8) to normal string (ASCII/ANSI)
 #define CONV_ARGUMENT_ENCODING(x) x = utf8_to_multibyte_t::convert(x.c_str());
 
 // convert TagLib string type (ASCII/ANSI/UTF-8/UTF-16/etc.) to UTF-8
-#define TAGLIB_STRING_TO_UTF8(x) code_cvt_helper<TagLib::String>::toUtf8(x)
+#define TAGLIB_STRING_TO_UTF8(x) _TO_UTF8(x, TagLib::String)
 
 #endif // MERRY_GO_ROUND_ENCODER_HPP

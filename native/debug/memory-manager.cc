@@ -2,11 +2,6 @@
 
 #if defined(_DEBUG)
 #	undef new
-
-void onExit() {
-	MemoryManager::getInstance()->release();
-}
-
 char MemoryManager::MemoryMap::buffer[4096];
 
 MemoryManager::MemoryMap::MemoryMap(void* pointer, std::size_t size, char const* path, int line) :
@@ -28,20 +23,10 @@ MemoryManager* MemoryManager::getInstance(void) {
 	return instance;
 }
 
-MemoryManager::MemoryManager(void) {
-	std::atexit(onExit);
-}
+MemoryManager::MemoryManager(void) {}
 MemoryManager::~MemoryManager(void) {
 	MemoryManager::isFianlized = true;
-	for (const auto& item : this->memoryDictionary) {
-		item.second.tryDump();
-	}
-
-#if defined(_WIN32)
-	if (this->memoryDictionary.size() > 0) {
-		DebugBreak();
-	}
-#endif
+	this->checkMemoryLeak();
 }
 
 void* MemoryManager::alloc(std::size_t size, char const* path, int line) throw(std::bad_alloc) {
@@ -64,6 +49,18 @@ void MemoryManager::free(void* pointer) throw() {
 
 	if (!MemoryManager::isFianlized)
 		this->memoryDictionary.erase(pointer);
+}
+
+void MemoryManager::checkMemoryLeak(void) {
+	for (const auto& item : this->memoryDictionary) {
+		item.second.tryDump();
+	}
+
+#if defined(_WIN32)
+	if (this->memoryDictionary.size() > 0) {
+		DebugBreak();
+	}
+#endif
 }
 
 void MemoryManager::release(void) {

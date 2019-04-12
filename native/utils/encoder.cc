@@ -40,7 +40,10 @@ public:
 			delete[] global_buffer_t::buffer;
 		}
 
-		global_buffer_t::buffer = new data_t[nearestLength];
+		// I used unmanaged one (malloc) here because it'll be DESTRUCTED when node.js instance is about to close.
+		// because watcher is defined as *static* variable. and static variable destructing is called lately than
+		// callback registered by `napi_add_env_cleanup_hook`.
+		global_buffer_t::buffer = static_cast<data_t*>(malloc(nearestLength * sizeof(size_t)));
 		global_buffer_t::length = nearestLength;
 
 returning:
@@ -49,11 +52,15 @@ returning:
 	}
 };
 
-template <> Watcher global_buffer_t<char>::watch([]() { delete[] global_buffer_t<char>::buffer; });
+template <> Watcher global_buffer_t<char>::watch([]() { 
+	delete[] global_buffer_t<char>::buffer; 
+});
 template <> char* global_buffer_t<char>::buffer = nullptr;
 template <> std::size_t global_buffer_t<char>::length = 0;
 
-template <> Watcher global_buffer_t<wchar_t>::watch([]() { delete[] global_buffer_t<wchar_t>::buffer; });
+template <> Watcher global_buffer_t<wchar_t>::watch([]() {
+	delete[] global_buffer_t<wchar_t>::buffer; 
+});
 template <> wchar_t* global_buffer_t<wchar_t>::buffer = nullptr;
 template <> std::size_t global_buffer_t<wchar_t>::length = 0;
 
@@ -142,9 +149,4 @@ utf8_t::elem_t* code_cvt_helper::toUtf8<TagLib::String>(TagLib::String&& ref) {
 template <>
 utf8_t::elem_t* code_cvt_helper::toUtf8<std::string>(std::string&& ref) {
 	return unmanaged_multibyte_to_utf8_t::convert(ref.c_str());
-}
-
-template <>
-utf8_t::elem_t* code_cvt_helper::toUtf8<char>(const char* ref) {
-	return unmanaged_multibyte_to_utf8_t::convert(ref);
 }

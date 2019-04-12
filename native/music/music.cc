@@ -1,182 +1,89 @@
 #include "../includes.hpp"
 
-const char* FILE_TYPE_STRINGS[] = {
-	"Unknown",
-	"MPEG",
-	"Ogg::Vorbis",
-	"Ogg::FLAC",
-	"FLAC",
-	"MPC",
-	"WavPack",
-	"Ogg::Speex",
-	"Ogg::Opus",
-	"TrueAudio",
-	"MP4",
-	"ASF",
-	"RIFF::AIFF",
-	"RIFF::WAV",
-	"APE",
-	"DSDIFF",
-	"DSF"
-};
+Napi::FunctionReference Music::constructor;
+collector_t<Music> Music::collector([](Music* music) {
+	music->release();
+});
 
-Music* Music::create(std::string path) {
-	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
+Napi::Object Music::initialize(Napi::Env env, Napi::Object exports) {
+	Napi::HandleScope scope(env);
 
-	static Dictionary<std::string, Music*> dictionary;
-	CONV_ARGUMENT_ENCODING(path);
-
-	if (dictionary.exists(path)) {
-		return dictionary[path];
-	}
-
-	Music* music = new Music(path);
-	if (!music->stream.isOpen() || music->file->isNull()) {
-		delete music;
-		return nullptr;
-	}
-
-	dictionary[path] = music;
-	return music;
-}
-
-Music::Music(const std::string& path) :
-	filePath(path), stream(path.c_str()), file(nullptr), tag(nullptr), 
-	retrieved(false), fileType(Unknown), musicInternal(nullptr) {
-	this->file = new TagLib::FileRef(&this->stream);
-	this->tag = file->tag();
-}
-Music::~Music(void) {
-	delete this->file;
-	if (this->musicInternal)
-		delete this->musicInternal;
-}
-
-node_string_t Music::title(void) const {
-	return NODE_STRING(this->tag->title());
-}
-node_string_t Music::artist(void) const {
-	return NODE_STRING(this->tag->artist());
-}
-node_string_t Music::album(void) const {
-	return NODE_STRING(this->tag->album());
-}
-node_string_t Music::genre(void) const {
-	return NODE_STRING(this->tag->genre());
-}
-unsigned int Music::year(void) const {
-	return this->tag->year();
-}
-unsigned int Music::track(void) const {
-	return this->tag->track();
-}
-
-const char* Music::type(void) {
-	if (!this->retrieved) {
-		this->retrieve();
-	}
-
-	return FILE_TYPE_STRINGS[static_cast<std::size_t>(this->fileType)];
-}
-std::string Music::tagType(void) {
-	if (!this->retrieved) {
-		this->retrieve();
-	}
-
-	if (this->musicInternal == nullptr) {
-		return "Unknown";
-	}
-
-	return this->musicInternal->tagType();
-}
-
-native_data_t Music::nativeData(void) {
-	if (!this->retrieved) {
-		this->retrieve();
-	}
-
-	return this->musicInternal->nativeData();
-}
-
-struct TypeChecker {
-	template <typename T>
-	TypeChecker(TagLib::FileStream& f, T& callback) : 
-		t(Music::MPEG), f(f), found(false), callback(callback) { }
-
-	template <typename U>
-	void operator()(boost::type<U>) {
-		if (found) 
-			return;
-		else if (U::isSupported(&this->f)) {
-			found = true;
-			this->callback(this->t);
-		}
-
-		if (this->t != Music::DSF && this->t != Music::Unknown)
-			this->t = static_cast<Music::Type>(static_cast<int>(this->t) + 1);
-		else
-			this->t = Music::Unknown;
-	}
-
-	bool found;
-	std::function<void(Music::Type)> callback;
-	TagLib::FileStream& f;
-	Music::Type t;
-};
-
-void Music::retrieve(void) {
-	using namespace TagLib;
-	if (this->retrieved)
-		return;
-
-	typedef boost::mpl::list<
-		MPEG::File,
-		Ogg::Vorbis::File,
-		Ogg::FLAC::File,
-		FLAC::File,
-		MPC::File,
-		WavPack::File,
-		Ogg::Speex::File,
-		Ogg::Opus::File,
-		TrueAudio::File,
-		MP4::File,
-		ASF::File,
-		RIFF::AIFF::File,
-		RIFF::WAV::File,
-		APE::File,
-		DSDIFF::File,
-		DSF::File
-	> supported_file_types;
-
-	TypeChecker checker(this->stream, [&](Music::Type t) {
-		this->fileType = t;
+	Napi::Function func = DefineClass(env, "Music", {
+		InstanceMethod("title", &Music::title),
+		InstanceMethod("artist", &Music::artist),
+		InstanceMethod("album", &Music::album),
+		InstanceMethod("genre", &Music::genre),
+		InstanceMethod("year", &Music::year),
+		InstanceMethod("track", &Music::track),
 	});
-	boost::mpl::for_each<supported_file_types, boost::type<boost::mpl::_>>(checker);
 
-	File* f = this->file->file();
-	if (this->fileType == Music::MPEG) {
-		this->musicInternal = new MPEGMusicInternal(f);
+	Music::constructor = Napi::Persistent(func);
+	Music::constructor.SuppressDestruct();
+
+	exports.Set("loadFromFile", Napi::Function::New(env, &Music::loadFromFile, "loadFromFile"));
+	return exports;
+}
+
+void Music::finalize(void) {
+	Music::collector.release();
+}
+
+node_any_t Music::loadFromFile(node_info_t info) {
+	Napi::EscapableHandleScope scope(info.Env());
+
+	node_string_t filePath = info[0].As<node_string_t>();
+	Napi::Object music = Music::constructor.New({ filePath });
+
+	return scope.Escape(napi_value(music)).ToObject();
+}
+
+Music::Music(node_info_t info) : 
+	Napi::ObjectWrap<Music>(info), fileRef(nullptr) {
+	if (info.Length() <= 0) {
+		throw std::invalid_argument("");
 	}
 
-	this->retrieved = true;
+	if (info[0].IsString()) {
+		this->constructFromFile(info[0].As<node_string_t>());
+	}
+
+	Music::collector[this] = this;
 }
+Music::~Music(void) {}
+
+void Music::constructFromFile(const node_string_t& string) {
+	std::string&& cString = string.Utf8Value();
+	
+	auto* filePath = unmanaged_utf8_to_multibyte_t::convert(cString.c_str());
+
+	boost::filesystem::path path(filePath);
+	if (boost::filesystem::exists(path) == false) {
+		throw std::logic_error("given file path doesn't exists");
+	}
+
+	this->fileRef = new TagLib::FileRef(filePath);
+	this->tag = this->fileRef->tag();
+}
+
+node_value_t Music::title(node_info_t info) {
+	return node_string_t::New(NODE_ENV, TO_UTF8(this->tag->title()));
+}
+node_value_t Music::artist(node_info_t info) {
+	return node_string_t::New(NODE_ENV, TO_UTF8(this->tag->artist()));
+}
+node_value_t Music::album(node_info_t info) {
+	return node_string_t::New(NODE_ENV, TO_UTF8(this->tag->album()));
+}
+node_value_t Music::genre(node_info_t info) {
+	return node_string_t::New(NODE_ENV, TO_UTF8(this->tag->genre()));
+}
+node_value_t Music::year(node_info_t info) {
+	return node_number_t::New(NODE_ENV, this->tag->year());
+}
+node_value_t Music::track(node_info_t info) {
+	return node_number_t::New(NODE_ENV, this->tag->track());
+}
+
 void Music::release(void) {
-	delete this;
-}
-
-#include "../nbind.hpp"
-
-using NativeMusic = Music;
-
-NBIND_CLASS(NativeMusic) {
-	method(create);
-	method(title);
-	method(artist);
-	method(album);
-	method(genre);
-	method(year);
-	method(track);
-	method(type);
-	method(tagType);
-	method(nativeData);
+	delete this->fileRef;
 }

@@ -26,8 +26,7 @@
         "noUnusedParameters": false
     },
     "files": [
-        "src/index.ts",
-        "src/lib-types.d.ts"
+        "src/index.ts"
     ],
     "exclude": [
         "**/node_modules/*"

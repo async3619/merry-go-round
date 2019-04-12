@@ -42,24 +42,21 @@
 #include <boost/locale.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/mpl/for_each.hpp>
+#include <boost/mpl/map.hpp>
+#include <boost/mpl/at.hpp>
 #include <boost/type.hpp>
+#include <boost/filesystem.hpp>
 
-#include <nbind/api.h>
+#include <napi.h>
 
 #include "releasable.hpp"
 
 #include "utils/utils.hpp"
 #include "debug/debug.hpp"
 
-#include "utils/buffer-manager.hpp"
-#include "utils/string-manager.hpp"
 #include "utils/encoder.hpp"
+#include "utils/object-collector.hpp"
 
-#include "object.hpp"
-#include "dictionary.hpp"
-
-#include "music/internal/internal.hpp"
-#include "music/internal/mpeg.hpp"
 #include "music/music.hpp"
 
 #endif // MERRY_GO_ROUND_INCLUDES_HPP

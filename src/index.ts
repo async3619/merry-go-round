@@ -1,6 +1,6 @@
-import * as nbind from "nbind";
-import * as LibTypes from "./lib-types";
+/* eslint-disable global-require */
+import { NativeAddon } from "./types";
 
-const { lib } = nbind.init<typeof LibTypes>();
+const merryGoRound: NativeAddon = require("bindings")("merry-go-round");
 
-export const { NativeMusic: Music, BufferManager } = lib;
+export const { loadFromFile } = merryGoRound;

@@ -46,6 +46,9 @@ public:
 	void free(void* pointer) throw();
 
 public:
+	void checkMemoryLeak(void);
+
+public:
 	virtual void release(void) override;
 
 private:
