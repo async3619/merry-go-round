@@ -14,7 +14,7 @@ export interface ID3v2ChapterFrame {
 
 export interface ID3v2AttachedPictureFrame {
     mimeType: string;
-    types: { id: number; description: string };
+    type: { id: number; description: string };
     data: Buffer;
     description: string;
 }
