@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
-import { NativeAddon } from "./types";
+import { MerryGoRound, NativeAddon } from "./types";
 
 const merryGoRound: NativeAddon = require("bindings")("merry-go-round");
 
-export const { loadFromFile } = merryGoRound;
+export const { loadFromFile }: MerryGoRound = merryGoRound;

@@ -10,3 +10,5 @@ export interface NativeMusic {
 export interface NativeAddon {
     loadFromFile(path: String): NativeMusic;
 }
+
+export interface MerryGoRound extends NativeAddon {}
