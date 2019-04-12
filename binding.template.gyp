@@ -6,7 +6,7 @@
 			"libraries": "%LIBRARY_FILES%",
 			"dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
 			"sources": [
-				"native/**/*.cc"
+				"<!@(node ./node_modules/ts-node/dist/bin.js tools/list-sources)"
 			],
 			"conditions": [
 				["OS=='win'", {
