@@ -1,5 +1,7 @@
 export type Arrayable<T> = T | T[];
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+export type SupportedFileType = "MPEG" | "Ogg::Vorbis" | "Ogg::FLAC" | "FLAC" | "MPC" | "WavPack" | "Ogg::Speex" |
+    "Ogg::Opus" | "TrueAudio" | "MP4" | "ASF" | "RIFF::AIFF" | "RIFF::WAV" | "APE" | "DSDIFF" | "DSF";
 
 export interface Range {
     start: number;
@@ -116,7 +118,7 @@ export interface NativeMusic {
     track(): string;
     tagType(): string;
     nativeData(): UnknownNativeData | ID3v2NativeData;
-    fileType(): string;
+    fileType(): SupportedFileType;
 }
 
 export interface NativeAddon {
