@@ -19,7 +19,7 @@ NodeString& NodeString::operator=(const NodeString& rhs) {
 	return (*this);
 }
 
-node_string_t NodeString::toJS(node_info_t info) const {
+node_value_t NodeString::toJS(node_info_t info) const {
 	const char* utf8String = this->encoded ? this->c_str() : unmanaged_multibyte_to_utf8_t::convert(this->c_str());
 	return node_string_t::New(NODE_ENV, utf8String);
 }

@@ -62,6 +62,7 @@
 #include "node/string.hpp"
 #include "node/object.hpp"
 #include "node/buffer.hpp"
+#include "node/array.hpp"
 
 #include "music/internal.hpp"
 #include "music/internal/mpeg.hpp"

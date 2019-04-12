@@ -2,7 +2,7 @@
 #define MERRY_GO_ROUND_BUFFER_HPP
 
 template <class T>
-class NodeBuffer : public NodeBase<node_buffer_t<T>> 
+class NodeBuffer : public NodeBase
 {
 private:
 	NodeBuffer(void) = delete;
@@ -57,7 +57,7 @@ public:
 	}
 
 public:
-	virtual node_buffer_t<T> toJS(node_info_t info) const override {
+	virtual node_value_t toJS(node_info_t info) const override {
 		return node_buffer_t<T>::New(NODE_ENV, this->data, this->length);
 	}
 
