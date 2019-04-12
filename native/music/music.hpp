@@ -28,11 +28,16 @@ public:
 	node_value_t genre(node_info_t info);
 	node_value_t year(node_info_t info);
 	node_value_t track(node_info_t info);
+	node_value_t tagType(node_info_t info);
+
+private:
+	void resolve(void);
 
 private:
 	virtual void release(void) override;
 
 private:
+	MusicInternal* musicInternal;
 	TagLib::FileRef* fileRef;
 	TagLib::Tag* tag;
 };

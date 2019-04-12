@@ -35,14 +35,15 @@
 #include <taglib/dsffile.h>
 #include <taglib/dsdifffile.h>
 #include <taglib/privateframe.h>
+#include <taglib/tbytevectorstream.h>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/type_index.hpp>
 #include <boost/locale.hpp>
-#include <boost/mpl/list.hpp>
-#include <boost/mpl/for_each.hpp>
+#include <boost/mpl/vector.hpp>
 #include <boost/mpl/map.hpp>
+#include <boost/mpl/for_each.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/type.hpp>
 #include <boost/filesystem.hpp>
@@ -57,6 +58,11 @@
 #include "utils/encoder.hpp"
 #include "utils/object-collector.hpp"
 
+#include "node/base.hpp"
+#include "node/string.hpp"
+
+#include "music/internal.hpp"
+#include "music/internal/mpeg.hpp"
 #include "music/music.hpp"
 
 #endif // MERRY_GO_ROUND_INCLUDES_HPP

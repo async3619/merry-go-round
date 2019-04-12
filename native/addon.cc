@@ -11,7 +11,9 @@ void finalizeAddon(void* args) {
 Napi::Object intitializeAddon(Napi::Env env, Napi::Object exports) {
 	napi_add_env_cleanup_hook(env, finalizeAddon, nullptr);
 
-	return Music::initialize(env, exports);
+	Music::initialize(env, exports);
+
+	return exports;
 }
 
 NODE_API_MODULE(addon, intitializeAddon);

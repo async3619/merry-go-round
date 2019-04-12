@@ -5,6 +5,7 @@ export interface NativeMusic {
     genre(): string;
     year(): string;
     track(): string;
+    tagType(): string;
 }
 
 export interface NativeAddon {

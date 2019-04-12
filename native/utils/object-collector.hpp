@@ -1,5 +1,5 @@
-#ifndef MERRY_GO_ROUND_DICTIONARY_HPP
-#define MERRY_GO_ROUND_DICTIONARY_HPP
+#ifndef MERRY_GO_ROUND_OBJECT_COLLECTOR_HPP
+#define MERRY_GO_ROUND_OBJECT_COLLECTOR_HPP
 
 template <typename TKey, typename TValue>
 class ObjectCollector : public std::unordered_map<TKey, TValue>, Releasable
@@ -34,4 +34,4 @@ private:
 template <typename TObject>
 using collector_t = ObjectCollector<TObject*, TObject*>;
 
-#endif // MERRY_GO_ROUND_DICTIONARY_HPP
+#endif // MERRY_GO_ROUND_OBJECT_COLLECTOR_HPP
