@@ -6,6 +6,7 @@ export interface NativeMusic {
     year(): string;
     track(): string;
     tagType(): string;
+    nativeData(): any;
 }
 
 export interface NativeAddon {

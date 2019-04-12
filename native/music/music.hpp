@@ -29,6 +29,7 @@ public:
 	node_value_t year(node_info_t info);
 	node_value_t track(node_info_t info);
 	node_value_t tagType(node_info_t info);
+	node_value_t nativeData(node_info_t info);
 
 private:
 	void resolve(void);

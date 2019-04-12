@@ -16,8 +16,10 @@ private:
 
 public:
 	virtual const NodeString& tagType(void) override;
+	virtual const NodeObject& nativeData(void) override;
 
 private:
+	NodeObject nativeDataStore;
 	NodeString tagTypeString;
 	TagLib::MPEG::File* file;
 };

@@ -60,6 +60,7 @@ Napi::Object Music::initialize(Napi::Env env, Napi::Object exports) {
 		InstanceMethod("year", &Music::year),
 		InstanceMethod("track", &Music::track),
 		InstanceMethod("tagType", &Music::tagType),
+		InstanceMethod("nativeData", &Music::nativeData),
 	});
 
 	Music::constructor = Napi::Persistent(func);
@@ -133,6 +134,11 @@ node_value_t Music::tagType(node_info_t info) {
 	const NodeString& type = this->musicInternal->tagType();
 
 	return type.toJS(info);
+}
+node_value_t Music::nativeData(node_info_t info) {
+	const NodeObject& data = this->musicInternal->nativeData();
+
+	return data.toJS(info);
 }
 
 struct type_finder {

@@ -12,6 +12,7 @@ public:
 
 public:
 	virtual const NodeString& tagType(void) = 0;
+	virtual const NodeObject& nativeData(void) = 0;
 };
 
 #endif // MERRY_GO_ROUND_INTERNAL_HPP

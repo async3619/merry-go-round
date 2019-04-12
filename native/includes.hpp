@@ -60,6 +60,7 @@
 
 #include "node/base.hpp"
 #include "node/string.hpp"
+#include "node/object.hpp"
 
 #include "music/internal.hpp"
 #include "music/internal/mpeg.hpp"

@@ -26,6 +26,14 @@ void MPEGMusicInternal::initializeId3v2(void) {
 	auto* header = tag->header();
 
 	this->tagTypeString = "ID3v2." + std::to_string(header->majorVersion());
+
+	const auto& frameList = tag->frameList();
+	for (auto* frame : frameList) {		
+		char buffer[5] = { 0, };
+		std::memcpy(buffer, frame->frameID().data(), frame->frameID().size());
+
+		this->nativeDataStore[buffer] = 3;
+	}
 }
 void MPEGMusicInternal::initializeId3v1(void) {
 	this->tagTypeString = "ID3v1";
@@ -36,4 +44,8 @@ void MPEGMusicInternal::initializeAPE(void) {
 
 const NodeString& MPEGMusicInternal::tagType(void) {
 	return this->tagTypeString;
+}
+
+const NodeObject& MPEGMusicInternal::nativeData(void) {
+	return this->nativeDataStore;
 }
