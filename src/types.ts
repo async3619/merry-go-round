@@ -116,6 +116,7 @@ export interface NativeMusic {
     track(): string;
     tagType(): string;
     nativeData(): UnknownNativeData | ID3v2NativeData;
+    fileType(): string;
 }
 
 export interface NativeAddon {

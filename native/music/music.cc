@@ -61,6 +61,7 @@ Napi::Object Music::initialize(Napi::Env env, Napi::Object exports) {
 		InstanceMethod("track", &Music::track),
 		InstanceMethod("tagType", &Music::tagType),
 		InstanceMethod("nativeData", &Music::nativeData),
+		InstanceMethod("fileType", &Music::fileType),
 	});
 
 	Music::constructor = Napi::Persistent(func);
@@ -84,7 +85,7 @@ node_any_t Music::loadFromFile(node_info_t info) {
 }
 
 Music::Music(node_info_t info) : 
-	Napi::ObjectWrap<Music>(info), fileRef(nullptr), musicInternal(nullptr) {
+	Napi::ObjectWrap<Music>(info), fileRef(nullptr), musicInternal(nullptr), resolved(false) {
 	if (info.Length() <= 0) {
 		throw std::invalid_argument("");
 	}
@@ -130,48 +131,70 @@ node_value_t Music::track(node_info_t info) {
 	return node_number_t::New(NODE_ENV, this->tag->track());
 }
 node_value_t Music::tagType(node_info_t info) {
-	this->resolve();
+	if (!this->resolved)
+		this->resolve();
+	
 	const NodeString& type = this->musicInternal->tagType();
-
 	return type.toJS(info);
 }
 node_value_t Music::nativeData(node_info_t info) {
-	const NodeObject& data = this->musicInternal->nativeData();
+	if (!this->resolved)
+		this->resolve();
 
+	const NodeObject& data = this->musicInternal->nativeData();
 	return data.toJS(info);
+}
+node_value_t Music::fileType(node_info_t info) {
+	if (!this->resolved)
+		this->resolve();
+
+	return this->fileTypeName.toJS(info);
 }
 
 struct type_finder {
 	template <typename T>
 	void operator()(boost::type<T>) {
-		if (!T::isSupported(this->stream))
-			return;
+		if (T::isSupported(this->stream)) {
+			using target_type = boost::mpl::at<music_internal_dictionary, T>::type;
+			auto* t = new boost::mpl::at<music_internal_dictionary, T>::type(file);
 
-		using target_type = boost::mpl::at<music_internal_dictionary, T>::type;
-		auto* t = new boost::mpl::at<music_internal_dictionary, T>::type(file);
+			this->callback(reinterpret_cast<MusicInternal*>(t), this->index);
+		}
 
-		this->callback(reinterpret_cast<MusicInternal*>(t));
+		++this->index;
 	}
 
-	std::function<void(MusicInternal*)> callback;
+	std::function<void(MusicInternal*, std::size_t)> callback;
 	const TagLib::FileRef* file;
 	TagLib::IOStream* stream;
+	std::size_t index;
 };
 
 void Music::resolve(void) {
+	std::vector<std::string> fileTypes = { 
+		"MPEG",	"Ogg::Vorbis", "Ogg::FLAC",	"FLAC",
+		"MPC", "WavPack", "Ogg::Speex", "Ogg::Opus",
+		"TrueAudio", "MP4", "ASF", "RIFF::AIFF", 
+		"RIFF::WAV", "APE",	"DSDIFF", "DSF",
+	};
+
 	TagLib::File* file = this->fileRef->file();
 	std::size_t fileSize = file->length();
 	TagLib::ByteVector&& byteVector = file->readBlock(fileSize);
 	TagLib::ByteVectorStream stream(byteVector);
 
 	type_finder finder;
+	finder.index = 0;
 	finder.stream = &stream;
 	finder.file = this->fileRef;
-	finder.callback = [=](MusicInternal* result) {
+	finder.callback = [this, &fileTypes](MusicInternal* result, std::size_t index) {
 		this->musicInternal = result;
+		this->fileTypeName = fileTypes[index];
 	};
 
 	boost::mpl::for_each<supported_file_types, boost::type<boost::mpl::_1>>(finder);
+
+	this->resolved = true;
 }
 
 void Music::release(void) {
