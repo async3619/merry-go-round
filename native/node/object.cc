@@ -1,7 +1,13 @@
 #include "../includes.hpp"
 
+DECLARE_TYPE(NodeObject);
+
 NodeObject::NodeObject(void) {}
 NodeObject::~NodeObject(void) {}
+
+bool NodeObject::exists(const std::string& key) {
+	return this->dictionary.find(key) != this->dictionary.cend();
+}
 
 node_value_t NodeObject::toJS(node_info_t info) const {
 	node_object_t nodeObject = node_object_t::New(NODE_ENV);

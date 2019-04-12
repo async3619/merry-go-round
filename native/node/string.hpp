@@ -3,6 +3,9 @@
 
 class NodeString : public NodeBase, std::string
 {
+private:
+	DEFINE_TYPE(NodeString);
+
 public:
 	NodeString(void);
 	NodeString(const NodeString& str);

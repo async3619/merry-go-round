@@ -1,8 +1,15 @@
+export type Arrayable<T> = T | T[];
+
 export interface ID3v2AttachedPictureFrame {
     mimeType: string;
     types: { id: number; description: string };
     data: Buffer;
     description: string;
+}
+
+export interface ID3v2PrivateFrame {
+    owner: string;
+    data: Buffer;
 }
 
 export interface UnknownNativeData {
@@ -12,7 +19,7 @@ export interface UnknownNativeData {
 export interface ID3v2NativeData {
     dataType: "ID3v2";
     AENC?: string;
-    APIC?: ID3v2AttachedPictureFrame;
+    APIC?: Arrayable<ID3v2AttachedPictureFrame>;
     COMM?: string;
     COMR?: string;
     ENCR?: string;
@@ -28,7 +35,7 @@ export interface ID3v2NativeData {
     PCNT?: string;
     POPM?: string;
     POSS?: string;
-    PRIV?: string;
+    PRIV?: Arrayable<ID3v2PrivateFrame>;
     RBUF?: string;
     RVAD?: string;
     RVRB?: string;

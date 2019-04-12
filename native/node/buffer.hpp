@@ -5,6 +5,9 @@ template <class T>
 class NodeBuffer : public NodeBase
 {
 private:
+	DEFINE_TYPE(NodeBuffer<T>);
+
+private:
 	NodeBuffer(void) = delete;
 
 public:
@@ -65,5 +68,8 @@ private:
 	T* data;
 	std::size_t length;
 };
+
+template <typename T>
+std::size_t NodeBuffer<T>::__id = reinterpret_cast<std::size_t>(&NodeBuffer<T>::__id);
 
 #endif // MERRY_GO_ROUND_BUFFER_HPP

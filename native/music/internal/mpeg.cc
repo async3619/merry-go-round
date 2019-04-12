@@ -2,6 +2,7 @@
 
 using TagLib::MPEG::File;
 using ID3v2Tag = TagLib::ID3v2::Tag;
+using ID3v2PrivateFrame = TagLib::ID3v2::PrivateFrame;
 
 std::unordered_map<ID3v2AttachedPictureFrame::Type, const char*> MPEGMusicInternal::idv2PictureTypeDictionary = {
 	{ ID3v2AttachedPictureFrame::Other, "Other" },
@@ -30,6 +31,7 @@ std::unordered_map<ID3v2AttachedPictureFrame::Type, const char*> MPEGMusicIntern
 MPEGMusicInternal::MPEGMusicInternal(const TagLib::FileRef* file) :
 	MusicInternal(file) {
 	this->resolverMap["ID3v2::APIC"] = std::bind(&MPEGMusicInternal::resolveIdv2AttachedPicture, this, std::placeholders::_1);
+	this->resolverMap["ID3v2::PRIV"] = std::bind(&MPEGMusicInternal::resolveIdv2Private, this, std::placeholders::_1);
 
 	this->file = reinterpret_cast<File*>(file->file());
 	this->initialize();
@@ -54,18 +56,34 @@ void MPEGMusicInternal::initializeId3v2(void) {
 	this->tagTypeString = "ID3v2." + std::to_string(header->majorVersion());
 	this->nativeDataStore["dataType"] = "ID3v2";
 
+	std::unordered_map<std::string, size_t> arrayMap;
 	const auto& frameList = tag->frameList();
-	for (auto* frame : frameList) {		
-		char buffer[5] = { 0, };
-		std::memcpy(buffer, frame->frameID().data(), frame->frameID().size());
-		
-		std::string frameId = buffer;
+	for (auto* frame : frameList) {
+		TagLib::ByteVector byteVector = frame->frameID();
+		std::string frameId(byteVector.data(), byteVector.size());
 
-		const auto iter = this->resolverMap.find("ID3v2::" + frameId);
-		if (iter != this->resolverMap.cend()) {
-			this->nativeDataStore[frameId] = iter->second(frame);
+		// we should skip it when duplicated key found.
+		if (arrayMap[frameId]) continue;
+
+		// if there is already data on the store with same id, we should collect it all and make it array.
+		if (this->nativeDataStore.exists(frameId) && arrayMap[frameId] == 0) {
+			// do loop whole frame list again and collect frames with same id.
+			NodeArray arr;
+			for (auto* targetFrame : frameList) {
+				if (targetFrame->frameID() == frameId.c_str()) {
+					auto&& holder = this->getHolderFromFrame("ID3v2", targetFrame);
+					arr.push_back(holder);
+				}
+			}
+
+			// renew value as array.
+			this->nativeDataStore[frameId] = arr;
+
+			// we should set the flag to prevent make it deep array.
+			arrayMap[frameId]++;
 		} else {
-			this->nativeDataStore[frameId] = frame->toString();
+			// or just add with its own type.
+			this->nativeDataStore[frameId] = this->getHolderFromFrame("ID3v2", frame);
 		}
 	}
 }
@@ -91,6 +109,33 @@ NodeObject MPEGMusicInternal::resolveIdv2AttachedPicture(ID3v2Frame* _frame) {
 	object["data"] = NodeBuffer<char>(picture.data(), picture.size());
 
 	return object;
+}
+NodeObject MPEGMusicInternal::resolveIdv2Private(ID3v2Frame* _frame) {
+	auto* frame = reinterpret_cast<ID3v2PrivateFrame*>(_frame);
+	auto data = frame->data();
+
+	NodeObject object;
+	NodeBuffer<char> buffer(data.data(), data.size());
+
+	object["owner"] = frame->owner();
+	object["data"] = buffer;
+
+	return object;
+}
+
+NodeBase::generator_holder MPEGMusicInternal::getHolderFromFrame(const std::string& type, ID3v2Frame* frame) {
+	TagLib::ByteVector byteVector = frame->frameID();
+	std::string frameId(byteVector.data(), byteVector.size());
+	NodeBase::generator_holder holder;
+	
+	const auto iter = this->resolverMap.find(type + "::" + frameId);
+	if (iter != this->resolverMap.cend()) {
+		holder = iter->second(frame);
+	} else {
+		holder = frame->toString();
+	}
+
+	return holder;
 }
 
 const NodeString& MPEGMusicInternal::tagType(void) {

@@ -3,6 +3,9 @@
 
 class NodeArray : public NodeBase
 {
+private:
+	DEFINE_TYPE(NodeArray);
+
 public:
 	NodeArray(void);
 	~NodeArray(void);
@@ -13,7 +16,7 @@ public:
 		generator_holder holder;
 		holder = value;
 
-		this->push_back(holder);
+		this->items.push_back(holder);
 	}
 
 	template <typename T>
@@ -21,7 +24,11 @@ public:
 		generator_holder holder;
 		holder = value;
 
-		this->push_back(holder);
+		this->items.push_back(holder);
+	}
+
+	void push_back(generator_holder&& holder) {
+		this->items.push_back(holder);
 	}
 
 public:

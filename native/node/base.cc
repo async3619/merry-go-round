@@ -73,4 +73,5 @@ NodeBase::generator_holder& NodeBase::generator_holder::operator=<char>(char dat
 
 SPECIALIZATION_NODE_OBJECT(NodeObject);
 SPECIALIZATION_NODE_OBJECT(NodeString);
+SPECIALIZATION_NODE_OBJECT(NodeArray);
 SPECIALIZATION_NODE_OBJECT(NodeBuffer<char>);

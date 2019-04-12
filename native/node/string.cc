@@ -1,5 +1,7 @@
 #include "../includes.hpp"
 
+DECLARE_TYPE(NodeString);
+
 NodeString::NodeString(void) :
 	encoded(false) {}
 NodeString::NodeString(const char* str, bool encoded) :

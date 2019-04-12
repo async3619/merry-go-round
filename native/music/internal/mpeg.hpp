@@ -24,6 +24,8 @@ private:
 
 private: // resolvers
 	NodeObject resolveIdv2AttachedPicture(ID3v2Frame* frame);
+	NodeObject resolveIdv2Private(ID3v2Frame* frame);
+	NodeBase::generator_holder getHolderFromFrame(const std::string& type, ID3v2Frame* frame);
 
 public:
 	virtual const NodeString& tagType(void) override;

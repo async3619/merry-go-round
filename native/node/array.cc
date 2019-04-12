@@ -1,5 +1,7 @@
 #include "../includes.hpp"
 
+DECLARE_TYPE(NodeArray);
+
 NodeArray::NodeArray(void) { }
 NodeArray::~NodeArray(void) { }
 
