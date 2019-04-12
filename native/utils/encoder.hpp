@@ -37,6 +37,9 @@ struct pure_type {
 
 struct code_cvt_helper {
 	template <class T>
+	static std::enable_if_t<std::is_class<typename pure_type<T>::type>::value, utf8_t::elem_t*> toUtf8(const T& ref);
+
+	template <class T>
 	static std::enable_if_t<std::is_class<typename pure_type<T>::type>::value, utf8_t::elem_t*> toUtf8(T&& ref);
 
 	template <class T>

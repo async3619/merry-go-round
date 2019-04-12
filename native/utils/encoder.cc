@@ -129,7 +129,7 @@ IMPL_CODE_CVT_MANAGED(utf8_to_wide_t);
 IMPL_CODE_CVT_MANAGED(utf8_to_multibyte_t);
 
 template <>
-utf8_t::elem_t* code_cvt_helper::toUtf8<TagLib::String>(TagLib::String&& ref) {
+utf8_t::elem_t* code_cvt_helper::toUtf8<TagLib::String>(const TagLib::String& ref) {
 	// check if given string object is unicode.
 	// if it's already a unicode string, that means it has own utf-8/16 string. 
 	// (which is at least wchar_t on windows)
@@ -144,6 +144,11 @@ utf8_t::elem_t* code_cvt_helper::toUtf8<TagLib::String>(TagLib::String&& ref) {
 	}
 
 	return result;
+}
+
+template <>
+utf8_t::elem_t* code_cvt_helper::toUtf8<TagLib::String>(TagLib::String&& ref) {
+	return code_cvt_helper::toUtf8<TagLib::String>(ref);
 }
 
 template <>

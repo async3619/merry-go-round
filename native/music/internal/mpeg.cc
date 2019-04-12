@@ -32,7 +32,7 @@ void MPEGMusicInternal::initializeId3v2(void) {
 		char buffer[5] = { 0, };
 		std::memcpy(buffer, frame->frameID().data(), frame->frameID().size());
 
-		this->nativeDataStore[buffer] = 3;
+		this->nativeDataStore[buffer] = frame->toString();
 	}
 }
 void MPEGMusicInternal::initializeId3v1(void) {

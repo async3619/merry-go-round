@@ -26,7 +26,10 @@ private:
 	public:
 		node_value_t operator()(node_info_t info) const;
 
-		template <typename T, typename Enable = void>
+		template <typename T, typename std::enable_if_t<!is_number<T> && std::is_class_v<T>>* = nullptr>
+		generator_holder& operator=(T&& data);
+
+		template <typename T, typename std::enable_if_t<!is_number<T>>* = nullptr>
 		generator_holder& operator=(_<T> data);
 
 		template <typename T, typename std::enable_if_t<is_number<T>>* = nullptr>

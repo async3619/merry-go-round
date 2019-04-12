@@ -33,7 +33,17 @@ NodeObject::generator_holder& NodeObject::operator[](std::string key) {
 template <>
 NodeObject::generator_holder& NodeObject::generator_holder::operator=<std::string>(const std::string& data) {
 	NodeString nodeString(data);
-	this->generator = [&](node_info_t info) {
+	this->generator = [=](node_info_t info) {
+		return nodeString.toJS(info);
+	};
+
+	return (*this);
+}
+
+template <>
+NodeObject::generator_holder& NodeObject::generator_holder::operator=<TagLib::String>(TagLib::String&& data) {
+	NodeString nodeString(code_cvt_helper::toUtf8(data), true);
+	this->generator = [=](node_info_t info) {
 		return nodeString.toJS(info);
 	};
 
@@ -43,7 +53,7 @@ NodeObject::generator_holder& NodeObject::generator_holder::operator=<std::strin
 template <>
 NodeObject::generator_holder& NodeObject::generator_holder::operator=<const char*>(const char* data) {
 	NodeString nodeString(data);
-	this->generator = [&](node_info_t info) {
+	this->generator = [=](node_info_t info) {
 		return nodeString.toJS(info);
 	};
 
@@ -55,7 +65,7 @@ NodeObject::generator_holder& NodeObject::generator_holder::operator=<char>(char
 	char buffer[2] = { data, 0 };
 
 	NodeString nodeString(buffer);
-	this->generator = [&](node_info_t info) {
+	this->generator = [=](node_info_t info) {
 		return nodeString.toJS(info);
 	};
 

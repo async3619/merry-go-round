@@ -7,7 +7,7 @@ public:
 	NodeString(void);
 	NodeString(const NodeString& str);
 	NodeString(NodeString&& str);
-	NodeString(const char* str);
+	NodeString(const char* str, bool encoded = false);
 	NodeString(const std::string& str);
 
 public:
@@ -15,6 +15,9 @@ public:
 
 public:
 	virtual node_string_t toJS(node_info_t info) const override;
+
+private:
+	bool encoded;
 };
 
 #endif // MERRY_GO_ROUND_STRING_HPP
