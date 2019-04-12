@@ -8,10 +8,9 @@ import { NativeMusic } from "../src/types";
 const SAMPLES_PATH = path.resolve(__dirname, "./samples");
 let music: NativeMusic | null = null;
 
-describe("Music class", () => {
-    it("should load media file through `create` method", () => {
+describe("Music", () => {
+    it("should load media file through `loadFromFile` method", () => {
         music = merryGoRound.loadFromFile(path.resolve(SAMPLES_PATH, "Witness-06-Farewell.mp3"));
-
         assert(music);
     });
 
