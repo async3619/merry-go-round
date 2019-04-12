@@ -3,6 +3,9 @@
 
 using ID3v2Frame = TagLib::ID3v2::Frame;
 using ID3v2AttachedPictureFrame = TagLib::ID3v2::AttachedPictureFrame;
+using ID3v2PrivateFrame = TagLib::ID3v2::PrivateFrame;
+using ID3v2ChapterFrame = TagLib::ID3v2::ChapterFrame;
+using ID3v2FrameList = TagLib::ID3v2::FrameList;
 
 typedef std::function<NodeObject(ID3v2Frame*)> resolver_t;
 
@@ -23,9 +26,13 @@ private:
 	void initializeAPE(void);
 
 private: // resolvers
-	NodeObject resolveIdv2AttachedPicture(ID3v2Frame* frame);
-	NodeObject resolveIdv2Private(ID3v2Frame* frame);
-	NodeBase::generator_holder getHolderFromFrame(const std::string& type, ID3v2Frame* frame);
+	NodeObject resolveId3v2AttachedPicture(ID3v2Frame* frame);
+	NodeObject resolveId3v2Private(ID3v2Frame* frame);
+	NodeObject resolveId3v2Chapter(ID3v2Frame* frame);
+
+private:
+	NodeObject parseId3v2FrameList(const ID3v2FrameList& frameList);
+	NodeBase::generator_holder extractDataFromFrame(const std::string& type, ID3v2Frame* frame);
 
 public:
 	virtual const NodeString& tagType(void) override;

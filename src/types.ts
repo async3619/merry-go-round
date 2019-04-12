@@ -1,4 +1,16 @@
 export type Arrayable<T> = T | T[];
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+
+export interface Range {
+    start: number;
+    end: number;
+}
+
+export interface ID3v2ChapterFrame {
+    time: Range;
+    offset: Range;
+    embedded?: Omit<ID3v2NativeData, "dataType">;
+}
 
 export interface ID3v2AttachedPictureFrame {
     mimeType: string;
@@ -20,6 +32,7 @@ export interface ID3v2NativeData {
     dataType: "ID3v2";
     AENC?: string;
     APIC?: Arrayable<ID3v2AttachedPictureFrame>;
+    CHAP?: Arrayable<ID3v2ChapterFrame>;
     COMM?: string;
     COMR?: string;
     ENCR?: string;
