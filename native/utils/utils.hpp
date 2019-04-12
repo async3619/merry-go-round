@@ -24,6 +24,9 @@ typedef Napi::Number node_number_t;
 typedef Napi::Object node_object_t;
 typedef Napi::Array node_array_t;
 
+template <typename T>
+using node_buffer_t = Napi::Buffer<T>;
+
 #define NAPI_DEFINE_METHOD(name) Napi::Value name(node_info_t info)
 
 class Watcher
