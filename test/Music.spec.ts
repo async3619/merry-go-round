@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as fs from "fs";
 import { assert, expect } from "chai";
 
 import * as merryGoRound from "../src";
@@ -44,22 +43,5 @@ describe("Music", () => {
 
     it("should be able to get raw tag data of media file", () => {
         assert(music.nativeData());
-    });
-
-    it("should be able to read album cover image data of media file (ID3v2::APIC)", () => {
-        const nativeData = music.nativeData();
-        if (nativeData.dataType === "ID3v2") {
-            assert(nativeData.APIC);
-            if (!Array.isArray(nativeData.APIC)) {
-                expect(nativeData.APIC.type.id).to.be.equal(0x03);
-                expect(nativeData.APIC.type.description).to.be.equal("Cover (front)");
-                expect(nativeData.APIC.description).to.be.equal("");
-                expect(nativeData.APIC.mimeType).to.be.equal("image/jpeg");
-                assert(nativeData.APIC.data instanceof Buffer);
-
-                const buffer = fs.readFileSync(path.resolve(SAMPLES_PATH, "./Witness-06-Farewell.cover.jpeg"));
-                assert(buffer.equals(nativeData.APIC.data));
-            }
-        }
     });
 });
