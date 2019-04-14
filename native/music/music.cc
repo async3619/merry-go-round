@@ -108,8 +108,31 @@ void Music::constructFromFile(const node_string_t& string) {
 		throw std::logic_error("given file path doesn't exists");
 	}
 
-	this->fileRef = new TagLib::FileRef(filePath);
+	// read the whole file into a buffer.
+	PlatformFile file(filePath);
+	std::size_t length = file.size();
+	auto* fileDataBuffer = new char[length];
+
+	if (!file.open()) {
+		throw std::logic_error("failed to open target file");
+	}
+
+	if (!file.read(fileDataBuffer, length)) {
+		throw std::logic_error("failed to read target file");
+	}
+
+	TagLib::ByteVector byteVector(fileDataBuffer, length);
+	TagLib::ByteVectorStream stream(byteVector);
+
+	delete[] fileDataBuffer;
+
+	// ... and initialize Music instance.
+	this->fileRef = new TagLib::FileRef(&stream);
 	this->tag = this->fileRef->tag();
+
+	// resolve it first because we don't use lazy resolving anymore.
+	// due to limitation of TagLib library that we don't open same file twice.
+	this->resolve();
 }
 
 node_value_t Music::title(node_info_t info) {

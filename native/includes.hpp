@@ -1,8 +1,9 @@
 #ifndef MERRY_GO_ROUND_INCLUDES_HPP
 #define MERRY_GO_ROUND_INCLUDES_HPP
 
-#define WIN32_LEAN_AND_MEAN
 #define TAGLIB_STATIC
+
+#include "preprocessors.hpp"
 
 #include <iostream>
 #include <cstring>
@@ -68,5 +69,7 @@
 #include "music/internal.hpp"
 #include "music/internal/mpeg.hpp"
 #include "music/music.hpp"
+
+#include "io/file.hpp"
 
 #endif // MERRY_GO_ROUND_INCLUDES_HPP

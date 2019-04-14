@@ -3,14 +3,14 @@ import * as fs from "fs";
 import { assert, expect } from "chai";
 
 import * as merryGoRound from "../src";
-import { ID3v2ChapterFrame, NativeMusic } from "../src/types";
+import { ID3v2ChapterFrame } from "../src/types";
 
 const SAMPLES_PATH = path.resolve(__dirname, "./samples");
-const music: NativeMusic | null = merryGoRound.loadFromFile(path.resolve(SAMPLES_PATH, "auphonic_chapters_demo.mp3"));
 const needSnapshot = process.argv.indexOf("--snapshot") >= 0;
 
 describe("Music::ID3v2", () => {
     it("should be able to read album cover image data of media file (ID3v2::APIC)", () => {
+        const music = merryGoRound.loadFromFile(path.resolve(SAMPLES_PATH, "auphonic_chapters_demo.mp3"));
         const nativeData = music.nativeData();
         if (nativeData.dataType === "ID3v2") {
             assert(nativeData.APIC);
@@ -28,6 +28,7 @@ describe("Music::ID3v2", () => {
     });
 
     it("should provide all chapter informations of media file (ID3v2::CHAP)", () => {
+        const music = merryGoRound.loadFromFile(path.resolve(SAMPLES_PATH, "auphonic_chapters_demo.mp3"));
         const nativeData = music.nativeData();
         if (nativeData.dataType === "ID3v2") {
             assert(nativeData.CHAP);

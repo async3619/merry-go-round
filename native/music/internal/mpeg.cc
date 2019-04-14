@@ -1,6 +1,6 @@
 #include "../../includes.hpp"
 
-using TagLib::MPEG::File;
+using MPEGFile = TagLib::MPEG::File;
 using ID3v2Tag = TagLib::ID3v2::Tag;
 
 std::unordered_map<ID3v2AttachedPictureFrame::Type, const char*> MPEGMusicInternal::idv2PictureTypeDictionary = {
@@ -33,7 +33,7 @@ MPEGMusicInternal::MPEGMusicInternal(const TagLib::FileRef* file) :
 	this->resolverMap["ID3v2::PRIV"] = std::bind(&MPEGMusicInternal::resolveId3v2Private, this, std::placeholders::_1);
 	this->resolverMap["ID3v2::CHAP"] = std::bind(&MPEGMusicInternal::resolveId3v2Chapter, this, std::placeholders::_1);
 
-	this->file = reinterpret_cast<File*>(file->file());
+	this->file = reinterpret_cast<MPEGFile*>(file->file());
 	this->initialize();
 }
 MPEGMusicInternal::~MPEGMusicInternal(void) {}
