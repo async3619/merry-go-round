@@ -6,14 +6,22 @@ import * as merryGoRound from "../src";
 import { ID3v2ChapterFrame } from "../src/types";
 
 const SAMPLES_PATH = path.resolve(__dirname, "./samples");
+const getSamplePath = (fileName: string) => path.resolve(SAMPLES_PATH, fileName);
 const needSnapshot = process.argv.indexOf("--snapshot") >= 0;
+
+function readNativeData(filePath: string) {
+    const music = merryGoRound.loadFromFile(getSamplePath(filePath));
+    return music.nativeData();
+}
 
 describe("Music::ID3v2", () => {
     it("should be able to read album cover image data of media file (ID3v2::APIC)", () => {
-        const music = merryGoRound.loadFromFile(path.resolve(SAMPLES_PATH, "auphonic_chapters_demo.mp3"));
-        const nativeData = music.nativeData();
+        const nativeData = readNativeData("auphonic_chapters_demo.mp3");
+
+        expect(nativeData.dataType).to.equal("ID3v2");
         if (nativeData.dataType === "ID3v2") {
             assert(nativeData.APIC);
+
             if (!Array.isArray(nativeData.APIC)) {
                 expect(nativeData.APIC.type.id).to.be.equal(0x03);
                 expect(nativeData.APIC.type.description).to.be.equal("Cover (front)");
@@ -27,9 +35,38 @@ describe("Music::ID3v2", () => {
         }
     });
 
-    it("should provide all chapter informations of media file (ID3v2::CHAP)", () => {
-        const music = merryGoRound.loadFromFile(path.resolve(SAMPLES_PATH, "auphonic_chapters_demo.mp3"));
-        const nativeData = music.nativeData();
+    it("should be able to read private information data of media file (ID3v2::PRIV)", () => {
+        const nativeData = readNativeData("Witness-06-Farewell.mp3");
+        const snapshotPath = getSamplePath("Witness-06-Farewell.private.json");
+
+        expect(nativeData.dataType).to.equal("ID3v2");
+        if (nativeData.dataType === "ID3v2") {
+            assert(nativeData.PRIV);
+            assert(Array.isArray(nativeData.PRIV)); // PRIV frame should be multiple for this file.
+
+            if (Array.isArray(nativeData.PRIV)) {
+                const result = nativeData.PRIV.map(privateFrame => ({
+                    owner: privateFrame.owner,
+                    data: privateFrame.data,
+                }));
+
+                const data = JSON.stringify(result);
+
+                if (needSnapshot) {
+                    fs.writeFileSync(snapshotPath, data);
+                } else {
+                    const snapshotData = fs.readFileSync(snapshotPath).toString();
+                    expect(data).to.be.equal(snapshotData);
+                }
+            }
+        }
+    });
+
+    it("should provide all chapter information of media file (ID3v2::CHAP)", () => {
+        const nativeData = readNativeData("auphonic_chapters_demo.mp3");
+        const snapshotPath = getSamplePath("auphonic_chapters_demo.chapters.json");
+
+        expect(nativeData.dataType).to.equal("ID3v2");
         if (nativeData.dataType === "ID3v2") {
             assert(nativeData.CHAP);
             assert(Array.isArray(nativeData.CHAP));
@@ -58,17 +95,13 @@ describe("Music::ID3v2", () => {
                     });
                 });
 
-                if (needSnapshot) {
-                    fs.writeFileSync(
-                        path.resolve(SAMPLES_PATH, "./auphonic_chapters_demo.chapters.json"),
-                        JSON.stringify(dataArray, null, 4),
-                    );
-                } else {
-                    const snapshotData = fs
-                        .readFileSync(path.resolve(SAMPLES_PATH, "./auphonic_chapters_demo.chapters.json"))
-                        .toString();
+                const data = JSON.stringify(dataArray);
 
-                    expect(JSON.stringify(dataArray, null, 4)).to.be.equal(snapshotData);
+                if (needSnapshot) {
+                    fs.writeFileSync(snapshotPath, data);
+                } else {
+                    const snapshotData = fs.readFileSync(snapshotPath).toString();
+                    expect(data).to.be.equal(snapshotData);
                 }
             }
         }
