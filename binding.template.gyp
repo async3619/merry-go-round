@@ -41,11 +41,11 @@
 				}],
 				["OS=='linux'", {
 					"ldflags": "%GCC_LIBRARY_PATH%",
-					"cflags!": ["-fno-exceptions"],
-					"cflags_cc!": ["-fno-exceptions"]
+					"cflags!": ["-fno-exceptions", "-fno-rtti"],
+					"cflags_cc!": ["-fno-exceptions", "-fno-rtti"]
 				}],
 				["OS=='mac'", {
-					"cflags+": ["-fvisibility=hidden"],
+					"cflags+": ["-fvisibility=hidden", "-fno-rtti"],
 					"xcode_settings": {
 						"OTHER_LDFLAGS": "%GCC_LIBRARY_PATH%",
 						"GCC_ENABLE_CPP_EXCEPTIONS": "YES",
