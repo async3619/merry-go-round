@@ -9,5 +9,10 @@ glob(path.resolve(SOURCE_ROOT, "**/*.cc"), {}, (err, matches) => {
         throw err;
     }
 
-    matches.forEach(filePath => console.log(filePath));
+    matches.forEach(filePath => {
+        if (process.platform !== "win32")
+            console.log(path.relative(PROJECT_ROOT, filePath));
+        else
+            console.log(filePath);
+    });
 });
