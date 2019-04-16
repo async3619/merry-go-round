@@ -6,7 +6,7 @@ struct null_internal_t {
 	}
 };
 
-using supported_file_types = boost::mpl::vector<
+using supported_file_types = brigand::list<
 	TagLib::MPEG::File,
 	TagLib::Ogg::Vorbis::File,
 	TagLib::Ogg::FLAC::File,
@@ -25,23 +25,23 @@ using supported_file_types = boost::mpl::vector<
 	TagLib::DSF::File
 >;
 
-using music_internal_dictionary = boost::mpl::map<
-	boost::mpl::pair<TagLib::MPEG::File, MPEGMusicInternal>,
-	boost::mpl::pair<TagLib::Ogg::Vorbis::File, null_internal_t>,
-	boost::mpl::pair<TagLib::Ogg::FLAC::File, null_internal_t>,
-	boost::mpl::pair<TagLib::FLAC::File, null_internal_t>,
-	boost::mpl::pair<TagLib::MPC::File, null_internal_t>,
-	boost::mpl::pair<TagLib::WavPack::File, null_internal_t>,
-	boost::mpl::pair<TagLib::Ogg::Speex::File, null_internal_t>,
-	boost::mpl::pair<TagLib::Ogg::Opus::File, null_internal_t>,
-	boost::mpl::pair<TagLib::TrueAudio::File, null_internal_t>,
-	boost::mpl::pair<TagLib::MP4::File, null_internal_t>,
-	boost::mpl::pair<TagLib::ASF::File, null_internal_t>,
-	boost::mpl::pair<TagLib::RIFF::AIFF::File, null_internal_t>,
-	boost::mpl::pair<TagLib::RIFF::WAV::File, null_internal_t>,
-	boost::mpl::pair<TagLib::APE::File, null_internal_t>,
-	boost::mpl::pair<TagLib::DSDIFF::File, null_internal_t>,
-	boost::mpl::pair<TagLib::DSF::File, null_internal_t>
+using music_internal_dictionary = brigand::map<
+	brigand::pair<TagLib::MPEG::File, MPEGMusicInternal>,
+	brigand::pair<TagLib::Ogg::Vorbis::File, null_internal_t>,
+	brigand::pair<TagLib::Ogg::FLAC::File, null_internal_t>,
+	brigand::pair<TagLib::FLAC::File, null_internal_t>,
+	brigand::pair<TagLib::MPC::File, null_internal_t>,
+	brigand::pair<TagLib::WavPack::File, null_internal_t>,
+	brigand::pair<TagLib::Ogg::Speex::File, null_internal_t>,
+	brigand::pair<TagLib::Ogg::Opus::File, null_internal_t>,
+	brigand::pair<TagLib::TrueAudio::File, null_internal_t>,
+	brigand::pair<TagLib::MP4::File, null_internal_t>,
+	brigand::pair<TagLib::ASF::File, null_internal_t>,
+	brigand::pair<TagLib::RIFF::AIFF::File, null_internal_t>,
+	brigand::pair<TagLib::RIFF::WAV::File, null_internal_t>,
+	brigand::pair<TagLib::APE::File, null_internal_t>,
+	brigand::pair<TagLib::DSDIFF::File, null_internal_t>,
+	brigand::pair<TagLib::DSF::File, null_internal_t>
 >;
 
 Napi::FunctionReference Music::constructor;
@@ -103,10 +103,10 @@ void Music::constructFromFile(const node_string_t& string) {
 	
 	auto* filePath = unmanaged_utf8_to_multibyte_t::convert(cString.c_str());
 
-	boost::filesystem::path path(filePath);
-	if (boost::filesystem::exists(path) == false) {
-		throw std::logic_error("given file path doesn't exists");
-	}
+	// boost::filesystem::path path(filePath);
+	// if (boost::filesystem::exists(path) == false) {
+	//	throw std::logic_error("given file path doesn't exists");
+	//}
 
 	// read the whole file into a buffer.
 	PlatformFile file(filePath);
@@ -176,10 +176,10 @@ node_value_t Music::fileType(node_info_t info) {
 
 struct type_finder {
 	template <typename T>
-	void operator()(boost::type<T>) {
+	void operator()(brigand::type_<T>) {
 		if (T::isSupported(this->stream)) {
-			using target_type = boost::mpl::at<music_internal_dictionary, T>::type;
-			auto* t = new boost::mpl::at<music_internal_dictionary, T>::type(file);
+			using target_type = brigand::at<music_internal_dictionary, T>;
+			auto* t = new target_type(file);
 
 			this->callback(reinterpret_cast<MusicInternal*>(t), this->index);
 		}
@@ -215,7 +215,7 @@ void Music::resolve(void) {
 		this->fileTypeName = fileTypes[index];
 	};
 
-	boost::mpl::for_each<supported_file_types, boost::type<boost::mpl::_1>>(finder);
+	brigand::for_each<supported_file_types>(finder);
 
 	this->resolved = true;
 }

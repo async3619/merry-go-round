@@ -39,16 +39,11 @@
 #include <taglib/tbytevectorstream.h>
 #include <taglib/chapterframe.h>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/type_index.hpp>
-#include <boost/locale.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/for_each.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/type.hpp>
-#include <boost/filesystem.hpp>
+#include <brigand/sequences/list.hpp>
+#include <brigand/sequences/map.hpp>
+#include <brigand/sequences/at.hpp>
+#include <brigand/algorithms/for_each.hpp>
+#include <brigand/adapted/pair.hpp>
 
 #include <napi.h>
 
