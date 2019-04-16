@@ -15,7 +15,6 @@
         "install": "yarn install-deps && yarn build && yarn compile",
         "compile": "tsc --project \"./tsconfig.build.json\" -m esnext --outDir dist/esnext && tsc --project \"./tsconfig.build.json\" -m commonjs --outDir dist/commonjs",
         "build": "cmake-js build",
-        "install-deps": "ts-node ./tools/install-deps",
         "clean": "rimraf dist build",
         "test": "cross-env mocha -r ts-node/register test/**/*.spec.ts",
         "build:debug": "cross-env NODE_ENV=debug yarn install-deps && cmake-js build --debug"
@@ -61,9 +60,5 @@
         "tslib": "^1.9.3",
         "tslint": "^5.14.0",
         "typescript": "^3.3.4000"
-    },
-    "nativeDependencies": [
-        "async3619/prebuilts/taglib",
-        "async3619/prebuilts/boost-filesystem"
-    ]
+    }
 }
