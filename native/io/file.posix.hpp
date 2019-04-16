@@ -18,7 +18,7 @@ public:
 	virtual bool read(char* buffer, std::size_t length, std::size_t begin = 0) override;
 
 private:
-	int file;
+	FILE* file;
 };
 
 #	endif

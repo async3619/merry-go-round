@@ -6,6 +6,7 @@
 #include "preprocessors.hpp"
 
 #include <iostream>
+#include <cstdio>
 #include <cstring>
 #include <functional>
 #include <unordered_map>
