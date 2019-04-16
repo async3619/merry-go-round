@@ -27,22 +27,11 @@ include(ExternalProject)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(SUPPORT_LARGE_FILES ON)
 if(UNIX AND NOT APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11")
-elseif(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0 /D_WIN32_WINNT=0x0601")
-else()
-    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ -mmacosx-version-min=10.10")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
 #
-# debug info
-#
-MESSAGE(STATUS "runtime:" ${NODE_RUNTIME})
-MESSAGE(STATUS "runtime version:" ${NODE_RUNTIMEVERSION})
-MESSAGE(STATUS "architecture:" ${NODE_ARCH})
-
-#
-# node-taglib2 specifics
+# compilation configure
 #
 file(GLOB_RECURSE SOURCE_FILES "native/*.cc" "native/*.hpp")
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -65,26 +54,26 @@ FOREACH(i RANGE 0 ${MERRY_GO_ROUND_DEPENDENCY_COUNT})
     # download and make dependency
     #
     ExternalProject_Add(
-            ${DEPENDENCY_NAME}
-            PREFIX "${DEPENDENCY_PATH}"
-            GIT_REPOSITORY ${DEPENDENCY_REPO}
-            GIT_SHALLOW true
-            INSTALL_DIR "${DEPENDENCY_PATH}"
-            CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${DEPENDENCY_PATH}"
-            CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
+        ${DEPENDENCY_NAME}
+        PREFIX "${DEPENDENCY_PATH}"
+        GIT_REPOSITORY ${DEPENDENCY_REPO}
+        GIT_SHALLOW true
+        INSTALL_DIR "${DEPENDENCY_PATH}"
+        CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${DEPENDENCY_PATH}"
+        CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
     )
 
     #
     # force rebuild of dependency source (useful when switching between node/electron)
     #
     ExternalProject_Add_Step(
-            ${DEPENDENCY_NAME}
-            forcebuild
-            COMMAND ${CMAKE_COMMAND} -E echo_append ""
-            COMMENT "Forcing build step for ${DEPENDENCY_NAME}"
-            DEPENDEES configure
-            DEPENDERS build
-            ALWAYS 1
+        ${DEPENDENCY_NAME}
+        forcebuild
+        COMMAND ${CMAKE_COMMAND} -E echo_append ""
+        COMMENT "Forcing build step for ${DEPENDENCY_NAME}"
+        DEPENDEES configure
+        DEPENDERS build
+        ALWAYS 1
     )
 
     #
