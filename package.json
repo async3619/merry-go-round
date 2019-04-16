@@ -12,7 +12,7 @@
     "author": "Sophia <async3619@naver.com>",
     "license": "MIT",
     "scripts": {
-        "install": "yarn install-deps && yarn build && yarn compile",
+        "install": "yarn build && yarn compile",
         "compile": "tsc --project \"./tsconfig.build.json\" -m esnext --outDir dist/esnext && tsc --project \"./tsconfig.build.json\" -m commonjs --outDir dist/commonjs",
         "build": "cmake-js build",
         "clean": "rimraf dist build",
