@@ -75,8 +75,8 @@ public:
 	public: \
 		static std::size_t typeId() { return type_name::__id; } \
 		virtual std::size_t type() const override { return type_name::__id; } \
-		template <typename T> \
-		bool instanceof(void) { return type_name::__id == T::typeId(); }
+		template <typename TTarget> \
+		bool instanceof(void) { return type_name::__id == TTarget::typeId(); }
 
 #define DECLARE_TYPE(type_name) \
 	std::size_t type_name::__id = reinterpret_cast<std::size_t>(&type_name::__id);
