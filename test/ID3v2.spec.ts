@@ -47,16 +47,14 @@ describe("Music::ID3v2", () => {
             if (Array.isArray(nativeData.PRIV)) {
                 const result = nativeData.PRIV.map(privateFrame => ({
                     owner: privateFrame.owner,
-                    data: privateFrame.data,
+                    data: privateFrame.data.toString(),
                 }));
 
-                const data = JSON.stringify(result);
-
                 if (needSnapshot) {
-                    fs.writeFileSync(snapshotPath, data);
+                    fs.writeFileSync(snapshotPath, JSON.stringify(result));
                 } else {
-                    const snapshotData = fs.readFileSync(snapshotPath).toString();
-                    expect(data).to.be.equal(snapshotData);
+                    const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
+                    assert.deepEqual(snapshotData, result);
                 }
             }
         }
@@ -100,8 +98,8 @@ describe("Music::ID3v2", () => {
                 if (needSnapshot) {
                     fs.writeFileSync(snapshotPath, data);
                 } else {
-                    const snapshotData = fs.readFileSync(snapshotPath).toString();
-                    expect(data).to.be.equal(snapshotData);
+                    const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
+                    assert.deepEqual(snapshotData, dataArray);
                 }
             }
         }
