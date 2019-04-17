@@ -1,5 +1,6 @@
 #ifndef MERRY_GO_ROUND_PREPROCESSORS_HPP
 #	define MERRY_GO_ROUND_PREPROCESSORS_HPP
+#	define TEMPLACE_SPECIALIZE template <>
 #	if defined(_WIN32)
 #		define IO_H <io.h> 
 #		if defined(MERRY_GO_ROUND_USE_WIN32) || !defined(MERRY_GO_ROUND_USE_POSIX)

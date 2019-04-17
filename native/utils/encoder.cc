@@ -27,7 +27,8 @@ private:
 public:
 	static data_t* allocate(std::size_t length) {
 		if (length < global_buffer_t::length) {
-			goto returning;
+			std::memset(global_buffer_t::buffer, 0, sizeof(data_t) * global_buffer_t::length);
+			return global_buffer_t::buffer;
 		}
 
 		std::size_t nearestLength = 1;
@@ -46,25 +47,24 @@ public:
 		global_buffer_t::buffer = static_cast<data_t*>(malloc(nearestLength * sizeof(size_t)));
 		global_buffer_t::length = nearestLength;
 
-returning:
 		std::memset(global_buffer_t::buffer, 0, sizeof(data_t) * global_buffer_t::length);
 		return global_buffer_t::buffer;
 	}
 };
 
+template <> char* global_buffer_t<char>::buffer = nullptr;
+template <> std::size_t global_buffer_t<char>::length = 0;
 template <> Watcher global_buffer_t<char>::watch([]() { 
 	delete[] global_buffer_t<char>::buffer; 
 });
-template <> char* global_buffer_t<char>::buffer = nullptr;
-template <> std::size_t global_buffer_t<char>::length = 0;
 
+template <> wchar_t* global_buffer_t<wchar_t>::buffer = nullptr;
+template <> std::size_t global_buffer_t<wchar_t>::length = 0;
 template <> Watcher global_buffer_t<wchar_t>::watch([]() {
 	delete[] global_buffer_t<wchar_t>::buffer; 
 });
-template <> wchar_t* global_buffer_t<wchar_t>::buffer = nullptr;
-template <> std::size_t global_buffer_t<wchar_t>::length = 0;
 
-unmanaged_wide_to_multibyte_t::result_t unmanaged_wide_to_multibyte_t::convert(const input_t* input) {
+TEMPLACE_SPECIALIZE unmanaged_wide_to_multibyte_t::result_t unmanaged_wide_to_multibyte_t::convert(const input_t* input) {
 	using scope_t = unmanaged_wide_to_multibyte_t;
 
 	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
@@ -75,7 +75,7 @@ unmanaged_wide_to_multibyte_t::result_t unmanaged_wide_to_multibyte_t::convert(c
 
 	return output;
 }
-unmanaged_wide_to_utf8_t::result_t unmanaged_wide_to_utf8_t::convert(const input_t* input) {
+TEMPLACE_SPECIALIZE unmanaged_wide_to_utf8_t::result_t unmanaged_wide_to_utf8_t::convert(const input_t* input) {
 	using scope_t = unmanaged_wide_to_utf8_t;
 
 	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
@@ -87,7 +87,7 @@ unmanaged_wide_to_utf8_t::result_t unmanaged_wide_to_utf8_t::convert(const input
 	return output;
 }
 
-unmanaged_multibyte_to_wide_t::result_t unmanaged_multibyte_to_wide_t::convert(const input_t* input) {
+TEMPLACE_SPECIALIZE unmanaged_multibyte_to_wide_t::result_t unmanaged_multibyte_to_wide_t::convert(const input_t* input) {
 	using scope_t = unmanaged_multibyte_to_wide_t;
 
 	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
@@ -98,12 +98,12 @@ unmanaged_multibyte_to_wide_t::result_t unmanaged_multibyte_to_wide_t::convert(c
 
 	return output;
 }
-unmanaged_multibyte_to_utf8_t::result_t unmanaged_multibyte_to_utf8_t::convert(const input_t* input) {
+TEMPLACE_SPECIALIZE unmanaged_multibyte_to_utf8_t::result_t unmanaged_multibyte_to_utf8_t::convert(const input_t* input) {
 	unmanaged_multibyte_to_wide_t::result_t data = unmanaged_multibyte_to_wide_t::convert(input);
 	return unmanaged_wide_to_utf8_t::convert(data);
 }
 
-unmanaged_utf8_to_wide_t::result_t unmanaged_utf8_to_wide_t::convert(const input_t* input) {
+TEMPLACE_SPECIALIZE unmanaged_utf8_to_wide_t::result_t unmanaged_utf8_to_wide_t::convert(const input_t* input) {
 	using scope_t = unmanaged_utf8_to_wide_t;
 
 	std::size_t inputLength = string_helper<scope_t::input_t>::strlen(input);
@@ -114,12 +114,12 @@ unmanaged_utf8_to_wide_t::result_t unmanaged_utf8_to_wide_t::convert(const input
 
 	return output;
 }
-unmanaged_utf8_to_multibyte_t::result_t unmanaged_utf8_to_multibyte_t::convert(const input_t* input) {
+TEMPLACE_SPECIALIZE unmanaged_utf8_to_multibyte_t::result_t unmanaged_utf8_to_multibyte_t::convert(const input_t* input) {
 	unmanaged_utf8_to_wide_t::result_t data = unmanaged_utf8_to_wide_t::convert(input);
 	return unmanaged_wide_to_multibyte_t::convert(data);
 }
 
-#define IMPL_CODE_CVT_MANAGED(x) x::result_t x::convert(const input_t* input) { return x::inverse_t::convert(input); }
+#define IMPL_CODE_CVT_MANAGED(x) TEMPLACE_SPECIALIZE x::result_t x::convert(const input_t* input) { return x::inverse_t::convert(input); }
 
 IMPL_CODE_CVT_MANAGED(multibyte_to_wide_t);
 IMPL_CODE_CVT_MANAGED(multibyte_to_utf8_t);
