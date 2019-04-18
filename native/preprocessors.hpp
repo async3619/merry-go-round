@@ -5,7 +5,7 @@
 #		define IO_H <io.h> 
 #		if defined(MERRY_GO_ROUND_USE_WIN32) || !defined(MERRY_GO_ROUND_USE_POSIX)
 #			define _MERRY_GO_ROUND_USE_WIN32 
-#		elif defined(MERRY_GO_ROUND_USE_POSIX)
+#		elif defined(/*MERRY_GO_ROUND_USE_POSIX*/)
 #			define _MERRY_GO_ROUND_USE_POSIX
 #		endif
 #	else

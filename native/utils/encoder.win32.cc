@@ -1,4 +1,5 @@
 #include "../includes.hpp"
+#if defined(_MERRY_GO_ROUND_USE_WIN32) && !defined(_MERRY_GO_ROUND_USE_POSIX)
 
 template <typename char_t> 
 struct string_helper {};
@@ -155,3 +156,5 @@ template <>
 utf8_t::elem_t* code_cvt_helper::toUtf8<std::string>(std::string&& ref) {
 	return unmanaged_multibyte_to_utf8_t::convert(ref.c_str());
 }
+
+#endif
