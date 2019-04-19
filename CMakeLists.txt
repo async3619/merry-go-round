@@ -63,18 +63,20 @@ FOREACH(i RANGE 0 ${MERRY_GO_ROUND_DEPENDENCY_COUNT})
         CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
     )
 
-    #
-    # force rebuild of dependency source (useful when switching between node/electron)
-    #
-    ExternalProject_Add_Step(
-        ${DEPENDENCY_NAME}
-        forcebuild
-        COMMAND ${CMAKE_COMMAND} -E echo_append ""
-        COMMENT "Forcing build step for ${DEPENDENCY_NAME}"
-        DEPENDEES configure
-        DEPENDERS build
-        ALWAYS 1
-    )
+    IF (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        #
+        # force rebuild of dependency source (useful when switching between node/electron)
+        #
+        ExternalProject_Add_Step(
+            ${DEPENDENCY_NAME}
+            forcebuild
+            COMMAND ${CMAKE_COMMAND} -E echo_append ""
+            COMMENT "Forcing build step for ${DEPENDENCY_NAME}"
+            DEPENDEES configure
+            DEPENDERS build
+            ALWAYS 1
+        )
+    ENDIF ()
 
     #
     # include dependency
