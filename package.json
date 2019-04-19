@@ -14,7 +14,7 @@
     "scripts": {
         "install": "yarn build",
         "build": "node ./tools/build.js",
-        "build:debug": "cross-env NODE_ENV=debug yarn clean && yarn build --debug",
+        "build:debug": "cross-env MERRY_GO_ROUND_BUILD_MODE=debug yarn clean && yarn build --debug",
         "compile": "tsc --project \"./tsconfig.build.json\" -m esnext --outDir dist/esnext && tsc --project \"./tsconfig.build.json\" -m commonjs --outDir dist/commonjs",
         "clean": "rimraf dist build deps",
         "test": "mocha -r ts-node/register test/**/*.spec.ts"
