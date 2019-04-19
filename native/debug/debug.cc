@@ -3,10 +3,10 @@
 #if defined(_DEBUG)
 #	undef new
 
-void* operator new(size_t size, char const* path, int line) throw(std::bad_alloc) {
+void* operator new(size_t size, char const* path, int line) noexcept(false) {
 	return MemoryManager::getInstance()->alloc(size, path, line);
 }
-void* operator new[](size_t size, char const* path, int line) throw(std::bad_alloc) {
+void* operator new[](size_t size, char const* path, int line) noexcept(false) {
 	return MemoryManager::getInstance()->alloc(size, path, line);
 }
 void operator delete(void* address) noexcept {

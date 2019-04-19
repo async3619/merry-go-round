@@ -6,8 +6,8 @@
 #	include "memory-manager.hpp"
 
 // overload allocation/deallocation operator to find memory leak 
-void* operator new(size_t size, char const* path, int line) throw(std::bad_alloc);
-void* operator new[](size_t size, char const* path, int line) throw(std::bad_alloc);
+void* operator new(size_t size, char const* path, int line) noexcept(false);
+void* operator new[](size_t size, char const* path, int line) noexcept(false);
 void operator delete(void* address) noexcept;
 void operator delete[](void* address) noexcept;
 

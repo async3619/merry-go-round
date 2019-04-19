@@ -42,7 +42,7 @@ private:
 	~MemoryManager(void);
 
 public:
-	void* alloc(std::size_t size, char const* path, int line) throw(std::bad_alloc);
+	void* alloc(std::size_t size, char const* path, int line) noexcept(false);
 	void free(void* pointer) throw();
 
 public:
