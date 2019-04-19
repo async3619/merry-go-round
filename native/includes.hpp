@@ -40,6 +40,7 @@
 #include <taglib/tbytevectorstream.h>
 #include <taglib/chapterframe.h>
 #include <taglib/commentsframe.h>
+#include <taglib/eventtimingcodesframe.h>
 
 #include <brigand/sequences/list.hpp>
 #include <brigand/sequences/map.hpp>

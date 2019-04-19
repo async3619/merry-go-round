@@ -14,6 +14,15 @@ function readNativeData(filePath: string) {
     return music.nativeData();
 }
 
+function snapshot(snapshotPath: string, expected: any) {
+    if (needSnapshot) {
+        fs.writeFileSync(snapshotPath, JSON.stringify(expected));
+    } else {
+        const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
+        assert.deepEqual(snapshotData, expected);
+    }
+}
+
 describe("Music::ID3v2", () => {
     it("should be able to read album cover image data of media file (ID3v2::APIC)", () => {
         const nativeData = readNativeData("auphonic_chapters_demo.mp3");
@@ -44,12 +53,20 @@ describe("Music::ID3v2", () => {
             assert(nativeData.COMM && Array.isArray(nativeData.COMM));
 
             if (Array.isArray(nativeData.COMM)) {
-                if (needSnapshot) {
-                    fs.writeFileSync(snapshotPath, JSON.stringify(nativeData.COMM));
-                } else {
-                    const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
-                    assert.deepEqual(snapshotData, nativeData.COMM);
-                }
+                snapshot(snapshotPath, nativeData.COMM);
+            }
+        }
+    });
+
+    it("should parse all event timing code data of media file (ID3v2::ETCO)", () => {
+        const nativeData = readNativeData("id3v2.etco.mp3");
+        const snapshotPath = getSamplePath("id3v2.etco.json");
+
+        expect(nativeData.dataType).to.equal("ID3v2");
+        if (nativeData.dataType === "ID3v2") {
+            assert(nativeData.ETCO);
+            if (nativeData.ETCO) {
+                snapshot(snapshotPath, nativeData.ETCO);
             }
         }
     });
@@ -69,12 +86,7 @@ describe("Music::ID3v2", () => {
                     data: privateFrame.data.toString(),
                 }));
 
-                if (needSnapshot) {
-                    fs.writeFileSync(snapshotPath, JSON.stringify(result));
-                } else {
-                    const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
-                    assert.deepEqual(snapshotData, result);
-                }
+                snapshot(snapshotPath, result);
             }
         }
     });
@@ -112,14 +124,7 @@ describe("Music::ID3v2", () => {
                     });
                 });
 
-                const data = JSON.stringify(dataArray);
-
-                if (needSnapshot) {
-                    fs.writeFileSync(snapshotPath, data);
-                } else {
-                    const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
-                    assert.deepEqual(snapshotData, dataArray);
-                }
+                snapshot(snapshotPath, dataArray);
             }
         }
     });

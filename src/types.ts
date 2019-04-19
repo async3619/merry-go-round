@@ -8,9 +8,11 @@ export interface Range {
     end: number;
 }
 
+export interface TypeData { id: number; description: string; }
+
 export interface ID3v2AttachedPictureFrame {
     mimeType: string;
-    type: { id: number; description: string };
+    type: TypeData;
     data: Buffer;
     description: string;
 }
@@ -32,6 +34,16 @@ export interface ID3v2PrivateFrame {
     data: Buffer;
 }
 
+export interface ID3v2Event {
+    type: TypeData;
+    time: number;
+}
+
+export interface ID3v2EventTimeCodesFrame {
+    format: TypeData;
+    events: ID3v2Event[];
+}
+
 export interface UnknownNativeData {
     dataType: "Unknown";
 }
@@ -45,7 +57,7 @@ export interface ID3v2NativeData {
     COMR?: string;
     ENCR?: string;
     EQUA?: string;
-    ETCO?: string;
+    ETCO?: ID3v2EventTimeCodesFrame;
     GEOB?: string;
     GRID?: string;
     IPLS?: string;
