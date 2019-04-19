@@ -35,6 +35,25 @@ describe("Music::ID3v2", () => {
         }
     });
 
+    it("should be able to read full information of comment data of media file (ID3v2::COMM)", () => {
+        const nativeData = readNativeData("RushJet1 - Forgotten Music - 02 - Ancient Ruin Adventure.mp3");
+        const snapshotPath = getSamplePath("RushJet1 - Forgotten Music - 02 - Ancient Ruin Adventure.comments.json");
+
+        expect(nativeData.dataType).to.equal("ID3v2");
+        if (nativeData.dataType === "ID3v2") {
+            assert(nativeData.COMM && Array.isArray(nativeData.COMM));
+
+            if (Array.isArray(nativeData.COMM)) {
+                if (needSnapshot) {
+                    fs.writeFileSync(snapshotPath, JSON.stringify(nativeData.COMM));
+                } else {
+                    const snapshotData = JSON.parse(fs.readFileSync(snapshotPath).toString());
+                    assert.deepEqual(snapshotData, nativeData.COMM);
+                }
+            }
+        }
+    });
+
     it("should be able to read private information data of media file (ID3v2::PRIV)", () => {
         const nativeData = readNativeData("Witness-06-Farewell.mp3");
         const snapshotPath = getSamplePath("Witness-06-Farewell.private.json");

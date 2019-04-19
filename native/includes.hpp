@@ -39,6 +39,7 @@
 #include <taglib/privateframe.h>
 #include <taglib/tbytevectorstream.h>
 #include <taglib/chapterframe.h>
+#include <taglib/commentsframe.h>
 
 #include <brigand/sequences/list.hpp>
 #include <brigand/sequences/map.hpp>

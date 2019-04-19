@@ -8,16 +8,22 @@ export interface Range {
     end: number;
 }
 
+export interface ID3v2AttachedPictureFrame {
+    mimeType: string;
+    type: { id: number; description: string };
+    data: Buffer;
+    description: string;
+}
+
 export interface ID3v2ChapterFrame {
     time: Range;
     offset: Range;
     embedded?: Omit<ID3v2NativeData, "dataType">;
 }
 
-export interface ID3v2AttachedPictureFrame {
-    mimeType: string;
-    type: { id: number; description: string };
-    data: Buffer;
+export interface ID3v2CommentsFrame {
+    language: string;
+    text: string;
     description: string;
 }
 
@@ -35,7 +41,7 @@ export interface ID3v2NativeData {
     AENC?: string;
     APIC?: Arrayable<ID3v2AttachedPictureFrame>;
     CHAP?: Arrayable<ID3v2ChapterFrame>;
-    COMM?: string;
+    COMM?: Arrayable<ID3v2CommentsFrame>;
     COMR?: string;
     ENCR?: string;
     EQUA?: string;

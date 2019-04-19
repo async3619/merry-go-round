@@ -23,6 +23,10 @@ NodeBase::generator_holder& NodeBase::generator_holder::operator=<std::string>(c
 
 	return (*this);
 }
+template <>
+NodeBase::generator_holder& NodeBase::generator_holder::operator=<std::string>(std::string&& data) {
+	return this->operator=(data);
+}
 
 template <>
 NodeBase::generator_holder& NodeBase::generator_holder::operator=<TagLib::String>(const TagLib::String& data) {

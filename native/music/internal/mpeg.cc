@@ -32,6 +32,7 @@ MPEGMusicInternal::MPEGMusicInternal(const TagLib::FileRef* file) :
 	this->resolverMap["ID3v2::APIC"] = std::bind(&MPEGMusicInternal::resolveId3v2AttachedPicture, this, std::placeholders::_1);
 	this->resolverMap["ID3v2::PRIV"] = std::bind(&MPEGMusicInternal::resolveId3v2Private, this, std::placeholders::_1);
 	this->resolverMap["ID3v2::CHAP"] = std::bind(&MPEGMusicInternal::resolveId3v2Chapter, this, std::placeholders::_1);
+	this->resolverMap["ID3v2::COMM"] = std::bind(&MPEGMusicInternal::resolveId3v2Comments, this, std::placeholders::_1);
 
 	this->file = reinterpret_cast<MPEGFile*>(file->file());
 	this->initialize();

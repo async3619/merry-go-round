@@ -48,6 +48,21 @@ NodeObject MPEGMusicInternal::resolveId3v2Chapter(ID3v2Frame* _frame) {
 
 	return object;
 }
+NodeObject MPEGMusicInternal::resolveId3v2Comments(ID3v2Frame* _frame) {
+	auto* frame = reinterpret_cast<ID3v2CommentsFrame*>(_frame);
+	NodeObject object;
+
+	const TagLib::ByteVector languageBuffer = frame->language();
+	char language[16] = { 0, };
+
+	std::memcpy(language, languageBuffer.data(), languageBuffer.size() * sizeof(char));
+
+	object["language"] = std::string(language);
+	object["description"] = frame->description();
+	object["text"] = frame->text();
+
+	return object;
+}
 
 void MPEGMusicInternal::initializeId3v2(void) {
 	auto* tag = this->file->ID3v2Tag();
