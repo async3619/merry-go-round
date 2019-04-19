@@ -56,7 +56,7 @@ const deleteBuildPath = async () => {
 
     ps.on('exit', (code) => {
         if (code === 0 && fs.existsSync(BUILD_PATH)) {
-            fs.writeFileSync(path.resolve(__dirname, "..", "build", ".env"), isDebug ? "debug" : "release");
+            fs.writeFileSync(path.resolve(__dirname, "..", "build", ".env"), BUILD_MODE);
         }
 
         // eslint-disable-next-line unicorn/no-process-exit
