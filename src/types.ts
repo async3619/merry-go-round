@@ -1,14 +1,32 @@
 export type Arrayable<T> = T | T[];
-export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
-export type SupportedFileType = "MPEG" | "Ogg::Vorbis" | "Ogg::FLAC" | "FLAC" | "MPC" | "WavPack" | "Ogg::Speex" |
-    "Ogg::Opus" | "TrueAudio" | "MP4" | "ASF" | "RIFF::AIFF" | "RIFF::WAV" | "APE" | "DSDIFF" | "DSF";
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+export type SupportedFileType =
+    | "MPEG"
+    | "Ogg::Vorbis"
+    | "Ogg::FLAC"
+    | "FLAC"
+    | "MPC"
+    | "WavPack"
+    | "Ogg::Speex"
+    | "Ogg::Opus"
+    | "TrueAudio"
+    | "MP4"
+    | "ASF"
+    | "RIFF::AIFF"
+    | "RIFF::WAV"
+    | "APE"
+    | "DSDIFF"
+    | "DSF";
 
 export interface Range {
     start: number;
     end: number;
 }
 
-export interface TypeData { id: number; description: string; }
+export interface TypeData {
+    id: number;
+    description: string;
+}
 
 export interface ID3v2AttachedPictureFrame {
     mimeType: string;
@@ -29,11 +47,6 @@ export interface ID3v2CommentsFrame {
     description: string;
 }
 
-export interface ID3v2PrivateFrame {
-    owner: string;
-    data: Buffer;
-}
-
 export interface ID3v2Event {
     type: TypeData;
     time: number;
@@ -42,6 +55,64 @@ export interface ID3v2Event {
 export interface ID3v2EventTimeCodesFrame {
     format: TypeData;
     events: ID3v2Event[];
+}
+
+export interface ID3v2OwnershipFrame {
+    // The price paid.
+    pricePaid: number;
+
+    // The date purchased.
+    datePurchased: string;
+
+    // The seller.
+    seller: string;
+}
+
+export interface ID3v2PrivateFrame {
+    owner: string;
+    data: Buffer;
+}
+
+export interface ID3v2PeakVolume {
+    // The number of bits (in the range of 0 to 255) used to describe the peak volume.
+    bitsRepresenting: number;
+
+    // The array of bits (represented as a series of bytes) used to describe the peak volume.
+    volume: Buffer;
+}
+
+export interface ID3v2PopularimeterFrame {
+    // The email address.
+    email: string;
+
+    // The rating value.
+    rating: string;
+
+    // The counter value.
+    counter: string;
+}
+
+export interface ID3v2RelativeVolumeChannel {
+    // A type information of channel.
+    type: TypeData;
+
+    // The relative volume adjustment in decibels.
+    adjustment: number;
+
+    // The relative volume adjustment "index". As indicated by the ID3v2 standard this is a 16-bit signed integer that
+    // reflects the decibels of adjustment when divided by 512.
+    adjustmentIndex: number;
+
+    // The peak volume (represented as a length and a string of bits).
+    // peak: ID3v2PeakVolume;
+}
+
+export interface ID3v2RelativeVolumeFrame {
+    // The identification for this frame
+    identification: string;
+
+    // A list of channels with information currently in the frame.
+    channels: ID3v2RelativeVolumeChannel[];
 }
 
 export interface UnknownNativeData {
@@ -64,13 +135,14 @@ export interface ID3v2NativeData {
     LINK?: string;
     MCDI?: string;
     MLLT?: string;
-    OWNE?: string;
+    OWNE?: ID3v2OwnershipFrame;
     PCNT?: string;
-    POPM?: string;
+    POPM?: Arrayable<ID3v2PopularimeterFrame>;
     POSS?: string;
     PRIV?: Arrayable<ID3v2PrivateFrame>;
     RBUF?: string;
     RVAD?: string;
+    RVA2?: Arrayable<ID3v2RelativeVolumeFrame>;
     RVRB?: string;
     SYLT?: string;
     SYTC?: string;

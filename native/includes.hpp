@@ -41,6 +41,9 @@
 #include <taglib/chapterframe.h>
 #include <taglib/commentsframe.h>
 #include <taglib/eventtimingcodesframe.h>
+#include <taglib/ownershipframe.h>
+#include <taglib/popularimeterframe.h>
+#include <taglib/relativevolumeframe.h>
 
 #include <brigand/sequences/list.hpp>
 #include <brigand/sequences/map.hpp>
