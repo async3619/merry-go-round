@@ -12,6 +12,7 @@ void MPEGMusicInternal::registerAllId3v2Resolvers(void) {
 	REGISTER_RESOLVER(OWNE, resolveId3v2Ownership);
 	REGISTER_RESOLVER(POPM, resolveId3v2Popularimeter);
 	REGISTER_RESOLVER(RVA2, resolveId3v2RelativeVolume);
+	REGISTER_RESOLVER(SYLT, resolveId3v2SynchronisedLyrics);
 }
 
 NodeObject MPEGMusicInternal::resolveId3v2AttachedPicture(ID3v2Frame* _frame) {
@@ -167,6 +168,53 @@ NodeObject MPEGMusicInternal::resolveId3v2RelativeVolume(ID3v2Frame* _frame) {
 	}
 
 	object["channels"] = channelArray;
+
+	return object;
+}
+NodeObject MPEGMusicInternal::resolveId3v2SynchronisedLyrics(ID3v2Frame* _frame) {
+	auto* frame = reinterpret_cast<ID3v2SynchronizedLyricsFrame*>(_frame);
+	NodeObject object, timestampType, typeObject;
+	NodeArray synchedTextArray;
+
+	auto format = frame->timestampFormat();
+	timestampType["id"] = static_cast<int>(format);
+
+	switch (format) {
+	case TagLib::ID3v2::EventTimingCodesFrame::AbsoluteMpegFrames:
+		timestampType["description"] = "Absolute MPEG Frames";
+		break;
+
+	case TagLib::ID3v2::EventTimingCodesFrame::AbsoluteMilliseconds:
+		timestampType["description"] = "Absolute Milliseconds";
+		break;
+
+	default:
+		timestampType["description"] = "Unknown";
+		break;
+	}
+
+	auto type = frame->type();
+	typeObject["id"] = static_cast<int>(type);
+	typeObject["description"] = MPEGMusicInternal::idv2SynchronizedContentTypeDictionary[type];
+
+	const TagLib::ByteVector languageBuffer = frame->language();
+	char language[16] = { 0, };
+	std::memcpy(language, languageBuffer.data(), languageBuffer.size() * sizeof(char));
+
+	auto list = frame->synchedText();
+	for (const auto& synchedText : list) {
+		NodeObject text;
+		text["text"] = synchedText.text;
+		text["time"] = synchedText.time;
+
+		synchedTextArray.push_back(text);
+	}
+
+	object["language"] = std::string(language);
+	object["format"] = timestampType;
+	object["type"] = typeObject;
+	object["description"] = frame->description();
+	object["synchedText"] = synchedTextArray;
 
 	return object;
 }

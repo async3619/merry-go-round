@@ -44,6 +44,7 @@
 #include <taglib/ownershipframe.h>
 #include <taglib/popularimeterframe.h>
 #include <taglib/relativevolumeframe.h>
+#include <taglib/synchronizedlyricsframe.h>
 
 #include <brigand/sequences/list.hpp>
 #include <brigand/sequences/map.hpp>

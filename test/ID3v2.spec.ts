@@ -169,4 +169,18 @@ describe("Music::ID3v2", () => {
             }
         }
     });
+
+    it("should read all synchronised lyrics data of media file (ID3v2::SYLT)", () => {
+        const nativeData = readNativeData("id3v2.sylt.mp3");
+        const snapshotPath = getSamplePath("id3v2.sylt.json");
+
+        expect(nativeData.dataType).to.equal("ID3v2");
+        if (nativeData.dataType === "ID3v2") {
+            // There may be more than one "SYLT" frame in each tag
+            assert(nativeData.SYLT && Array.isArray(nativeData.SYLT));
+            if (nativeData.SYLT && Array.isArray(nativeData.SYLT)) {
+                snapshot(snapshotPath, nativeData.SYLT);
+            }
+        }
+    });
 });

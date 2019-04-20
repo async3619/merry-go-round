@@ -79,3 +79,15 @@ std::unordered_map<ID3v2RelativeVolumeFrame::ChannelType, const char*> MPEGMusic
 	{ ID3v2RelativeVolumeFrame::BackCentre, "Back Centre" },
 	{ ID3v2RelativeVolumeFrame::Subwoofer, "Subwoofer" },
 };
+
+std::unordered_map<ID3v2SynchronizedLyricsFrame::Type, const char*> MPEGMusicInternal::idv2SynchronizedContentTypeDictionary = {
+	{ ID3v2SynchronizedLyricsFrame::Other, "The text is some other type of text." },
+	{ ID3v2SynchronizedLyricsFrame::Lyrics, "The text contains lyrical data." },
+	{ ID3v2SynchronizedLyricsFrame::TextTranscription, "The text contains a transcription." },
+	{ ID3v2SynchronizedLyricsFrame::Movement, "The text lists the movements in the piece." },
+	{ ID3v2SynchronizedLyricsFrame::Events, "The text describes events that occur." },
+	{ ID3v2SynchronizedLyricsFrame::Chord, "The text contains chord changes that occur in the music." },
+	{ ID3v2SynchronizedLyricsFrame::Trivia, "The text contains trivia or \"pop up\" information about the media." },
+	{ ID3v2SynchronizedLyricsFrame::WebpageUrls, "The text contains URLs for relevant webpages." },
+	{ ID3v2SynchronizedLyricsFrame::ImageUrls, "The text contains URLs for relevant images." }, 
+};

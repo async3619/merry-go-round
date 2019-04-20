@@ -115,6 +115,28 @@ export interface ID3v2RelativeVolumeFrame {
     channels: ID3v2RelativeVolumeChannel[];
 }
 
+interface ID3v2SynchedText {
+    text: string;
+    time: number;
+}
+
+export interface ID3v2SynchronizedLyricsFrame {
+    // The language encoding as a 3 byte encoding as specified by ISO-639-2.
+    language: string;
+
+    // The timestamp format.
+    format: TypeData;
+
+    // The type of text contained.
+    type: TypeData;
+
+    // The description of this synchronized lyrics frame.
+    description: string;
+
+    // The text with the time stamps.
+    synchedText: ID3v2SynchedText[];
+}
+
 export interface UnknownNativeData {
     dataType: "Unknown";
 }
@@ -144,7 +166,7 @@ export interface ID3v2NativeData {
     RVAD?: string;
     RVA2?: Arrayable<ID3v2RelativeVolumeFrame>;
     RVRB?: string;
-    SYLT?: string;
+    SYLT?: Arrayable<ID3v2SynchronizedLyricsFrame>;
     SYTC?: string;
     TALB?: string;
     TBPM?: string;
