@@ -29,7 +29,7 @@ MemoryManager::~MemoryManager(void) {
 	this->checkMemoryLeak();
 }
 
-void* MemoryManager::alloc(std::size_t size, char const* path, int line) throw(std::bad_alloc) {
+void* MemoryManager::alloc(std::size_t size, char const* path, int line) noexcept(false) {
 	// allocate first
 	void* allocatedPointer = malloc(size);
 	if (!allocatedPointer) throw std::bad_alloc();
