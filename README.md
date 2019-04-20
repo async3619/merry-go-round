@@ -19,7 +19,7 @@
   <br />
 </div>
 
-<h2>Introduction</h2>
+## Introduction
 
 <img align="right" src="https://raw.githubusercontent.com/async3619/merry-go-round/master/docs/merry-go-round.gif" />
 
@@ -35,3 +35,35 @@ This is what I've disappointed about already existing modules:
 - Lack of typings: Yes, typings. recently I've seen statistics that show that many of developers are using typescript as their primary development language. therefore, it has became important to provide typing information to improve their developing experience while using this module.
 
 - Not maintained anymore: It's not easy to find alternative modules since most of tagging module of node.js out there are not maintained. so I've started to develop this one. as alternative of that modules.
+
+
+## Prerequisite
+
+This project uses `CMake` instead of `node-gyp`  to build codes so you have to install:
+
+- CMake 3.14+
+
+The code base of this project is C++17 compliant, so you need to have newer C++ compiler than other native addons.
+
+- g++ 8+
+
+or if you're on Windows...
+
+- Microsoft Visual Studio 2017+ (see [windows-build-tools](https://www.npmjs.com/package/windows-build-tools))
+
+
+## Installation
+
+currently, I have not published this module on NPM so you have to clone this project directly. and I really want to suggest you to use [Yarn](https://github.com/yarnpkg/yarn) instead of npm:
+
+```bash
+$ git clone https://github.com/async3619/merry-go-round
+$ cd merry-go-round
+$ yarn
+```
+
+or as a dependency:
+
+```bash
+$ yarn add https://github.com/async3619/merry-go-round
+```
