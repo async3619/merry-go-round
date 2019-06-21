@@ -12,7 +12,6 @@
     "author": "Sophia <async3619@naver.com>",
     "license": "MIT",
     "scripts": {
-        "install": "yarn build",
         "build": "node ./tools/build.js",
         "build:debug": "cross-env MERRY_GO_ROUND_BUILD_MODE=debug yarn clean && yarn build --debug",
         "compile": "tsc --project \"./tsconfig.build.json\" -m esnext --outDir dist/esnext && tsc --project \"./tsconfig.build.json\" -m commonjs --outDir dist/commonjs",
@@ -41,7 +40,7 @@
         "@typescript-eslint/parser": "^1.5.0",
         "chai": "^4.2.0",
         "cross-env": "^5.2.0",
-        "eslint": "^5.15.3",
+        "eslint": "^5.16.0",
         "eslint-config-airbnb-base": "^13.1.0",
         "eslint-config-prettier": "^4.1.0",
         "eslint-plugin-import": "^2.16.0",
