@@ -53,7 +53,7 @@
         "listr": "^0.14.3",
         "lodash.flatten": "^4.4.0",
         "mocha": "^6.0.2",
-        "node-fetch": "^2.3.0",
+        "node-fetch": "^3.1.1",
         "prettier": "^1.16.4",
         "rimraf": "^2.6.3",
         "tar": "^4.4.8",
